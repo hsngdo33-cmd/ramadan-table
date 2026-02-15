@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>جدول بطولة رمضان</title>
+  <meta name="description" content="جدول بطولة رمضان - مواعيد المباريات وخانات النتائج" />
+  <style>
+    :root{
+      --bg1:#070a1a;
+      --bg2:#0b1b3a;
+      --card:#0f234a;
+      --card2:#0c1d3f;
+      --text:#eef2ff;
+      --muted:#b6c2ff;
+      --gold:#ffd36a;
+      --green:#47f0b3;
+      --ring:rgba(255, 211, 106, .22);
+      --shadow: 0 14px 50px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(255,211,106,.14), transparent 60%),
+        radial-gradient(900px 500px at 80% 10%, rgba(71,240,179,.12), transparent 62%),
+        radial-gradient(1000px 650px at 50% 120%, rgba(124,92,255,.18), transparent 65%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+    }
+
+    /* subtle stars */
+    .stars{
+      position:fixed; inset:0; pointer-events:none; opacity:.55;
+      background-image:
+        radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,.35) 40%, transparent 41%),
+        radial-gradient(1.5px 1.5px at 30% 70%, rgba(255,255,255,.25) 40%, transparent 41%),
+        radial-gradient(1.8px 1.8px at 60% 30%, rgba(255,255,255,.28) 40%, transparent 41%),
+        radial-gradient(1.2px 1.2px at 80% 55%, rgba(255,255,255,.22) 40%, transparent 41%),
+        radial-gradient(1.6px 1.6px at 90% 15%, rgba(255,255,255,.20) 40%, transparent 41%);
+      background-repeat:repeat;
+      background-size: 420px 320px;
+      filter: blur(.1px);
+    }
+
+    .wrap{
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 22px 14px 44px;
+      position:relative;
+    }
+
+    header{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:flex-start;
+      padding: 18px 16px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,211,106,.10), rgba(255,211,106,.05));
+      border: 1px solid rgba(255,211,106,.18);
+      box-shadow: 0 10px 30px rgba(0,0,0,.20);
+      backdrop-filter: blur(6px);
+    }
+
+    .title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      line-height:1.2;
+    }
+    .badge{
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(71,240,179,.14);
+      border: 1px solid rgba(71,240,179,.25);
+      color: var(--green);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing:.3px;
+    }
+    h1{
+      margin:0;
+      font-size: 22px;
+      font-weight: 900;
+    }
+    .sub{
+      margin:0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 6px;
+    }
+    .btn{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor:pointer;
+      transition:.18s ease;
+      box-shadow: 0 10px 30px rgba(0,0,0,.15);
+    }
+    .btn:hover{ transform: translateY(-1px); border-color: rgba(255,211,106,.35); box-shadow: 0 14px 40px rgba(0,0,0,.22);}
+    .btn.primary{
+      background: linear-gradient(180deg, rgba(255,211,106,.18), rgba(255,211,106,.08));
+      border-color: rgba(255,211,106,.32);
+    }
+    .btn.danger{
+      background: linear-gradient(180deg, rgba(255,80,110,.18), rgba(255,80,110,.07));
+      border-color: rgba(255,80,110,.25);
+    }
+
+    .grid{
+      margin-top: 16px;
+      display:grid;
+      gap: 12px;
+    }
+
+    .match{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      padding: 14px 14px;
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .match:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(400px 140px at 20% 10%, rgba(255,211,106,.14), transparent 55%),
+                  radial-gradient(380px 150px at 90% 20%, rgba(71,240,179,.10), transparent 55%);
+      opacity:.75;
+      pointer-events:none;
+    }
+    .match > *{ position:relative; }
+
+    .rowTop{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+    .day{
+      display:flex; align-items:center; gap:10px;
+      font-weight: 900;
+    }
+    .day .moon{
+      width:34px; height:34px; border-radius:12px;
+      display:grid; place-items:center;
+      background: rgba(255,211,106,.12);
+      border:1px solid rgba(255,211,106,.25);
+      box-shadow: 0 0 0 6px var(--ring);
+      font-size: 16px;
+    }
+    .day small{
+      display:block;
+      margin-top:2px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .idtag{
+      padding:6px 10px;
+      border-radius: 12px;
+      background: rgba(124,92,255,.12);
+      border:1px solid rgba(124,92,255,.22);
+      color:#d9d4ff;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .teams{
+      display:grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items:center;
+      gap: 10px;
+      margin: 8px 0 12px;
+    }
+    .team{
+      background: rgba(15,35,74,.55);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      padding: 12px 12px;
+      font-weight: 900;
+      text-align:center;
+      line-height:1.25;
+    }
+    .vs{
+      font-weight: 1000;
+      color: var(--gold);
+      letter-spacing:.7px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,211,106,.10);
+      border: 1px solid rgba(255,211,106,.20);
+      white-space:nowrap;
+    }
+
+    .score{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+      padding-top: 6px;
+    }
+    .score label{
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .box{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 14px;
+      padding: 10px 10px;
+    }
+    input[type="number"]{
+      width: 76px;
+      padding: 10px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      font-weight: 900;
+      font-size: 16px;
+      outline:none;
+    }
+    input[type="number"]:focus{
+      border-color: rgba(255,211,106,.40);
+      box-shadow: 0 0 0 6px rgba(255,211,106,.12);
+    }
+    .dash{
+      font-weight: 1000;
+      color: var(--gold);
+      font-size: 18px;
+    }
+
+    footer{
+      margin-top: 18px;
+      padding: 14px 12px;
+      border-radius: 16px;
+      border:1px dashed rgba(255,255,255,.18);
+      color: var(--muted);
+      text-align:center;
+      background: rgba(255,255,255,.04);
+    }
+
+    @media (max-width: 560px){
+      .teams{ grid-template-columns: 1fr; }
+      .vs{ justify-self:center; }
+      input[type="number"]{ width: 70px; }
+    }
+
+    /* Print */
+    @media print{
+      body{ background:#fff; color:#000; }
+      .stars, .controls{ display:none !important; }
+      header, .match, footer{
+        box-shadow:none !important;
+        background:#fff !important;
+        border:1px solid #ddd !important;
+      }
+      .team, .box, input{ background:#fff !important; color:#000 !important; }
+      .vs{ color:#b07a00 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars"></div>
+
+  <div class="wrap">
+    <header>
+      <div class="title">
+        <span class="badge">🌙 رمضان كريم</span>
+        <h1>جدول بطولة رمضان – مباريات + نتائج</h1>
+      </div>
+      <p class="sub">اكتب النتيجة في الخانات… وبتتسجل تلقائيًا على نفس الجهاز ✅</p>
+
+      <div class="controls">
+        <button class="btn primary" id="printBtn">🖨️ طباعة / PDF</button>
+        <button class="btn" id="exportBtn">⬇️ تصدير النتائج (JSON)</button>
+        <button class="btn danger" id="resetBtn">🧹 مسح كل النتائج</button>
+      </div>
+    </header>
+
+    <main class="grid" id="matches"></main>
+
+    <footer>
+      🔥 ليالي رمضان غير… كورة + روح + منافسة شريفة 🔥⚽
+    </footer>
+  </div>
+
+  <script>
+    const data = [
+      { day: 1,  a: "اولاد حبيشي للجبس",          b: "كافيه ايطاليانو" },
+      { day: 2,  a: "البودي",                      b: "ابو ملاك للموتسيكلات" },
+      { day: 3,  a: "أصدقاء مصطفي الشحات",        b: "محمد حسن" },
+      { day: 4,  a: "أصدقاء فخراني",              b: "كافيه ايطاليانو" },
+      { day: 5,  a: "ابو ملاك للموتسيكلات",       b: "اولاد حبيشي للجبس" },
+      { day: 6,  a: "البودي",                      b: "محمد حسن" },
+      { day: 7,  a: "أصدقاء مصطفي شحات",          b: "كافيه ايطاليانو" },
+      { day: 8,  a: "ابو ملاك للموتسيكلات",       b: "أصدقاء الفخراني" },
+      { day: 9,  a: "محمد حسن",                   b: "اولاد حبيشي للجبس" },
+      { day: 10, a: "البودي",                     b: "كافيه ايطاليانو" },
+      { day: 11, a: "أصدقاء مصطفي شحات",          b: "أصدقاء فخراني" },
+      { day: 12, a: "ابو ملاك للموتسيكلات",       b: "محمد حسن" },
+      { day: 13, a: "اولاد حبيشي للجبس",          b: "البودي" },
+      { day: 14, a: "كافيه ايطاليانو",            b: "ابو ملاك للموتسيكلات" },
+      { day: 15, a: "أصدقاء الفخراني",            b: "محمد حسن" },
+      { day: 16, a: "البودي",                     b: "أصدقاء مصطفي الشحات" },
+      { day: 17, a: "اولاد حبيشي للجبس",          b: "أصدقاء الفخراني" },
+      { day: 18, a: "ابو ملاك للموتسيكلات",       b: "أصدقاء مصطفي الشحات" },
+      { day: 19, a: "محمد حسن",                   b: "كافيه ايطاليانو" },
+      { day: 20, a: "أصدقاء الفخراني",            b: "البودي" },
+      { day: 21, a: "اولاد حبيشي للجبس",          b: "أصدقاء مصطفي الشحات" },
+    ];
+
+    const KEY = "ramadan_table_scores_v1";
+
+    function loadScores(){
+      try { return JSON.parse(localStorage.getItem(KEY) || "{}"); }
+      catch { return {}; }
+    }
+    function saveScores(scores){
+      localStorage.setItem(KEY, JSON.stringify(scores));
+    }
+
+    const scores = loadScores();
+    const root = document.getElementById("matches");
+
+    function matchKey(day){ return `day_${day}`; }
+
+    function render(){
+      root.innerHTML = "";
+      data.forEach((m, idx) => {
+        const k = matchKey(m.day);
+        const s = scores[k] || { a:"", b:"" };
+
+        const card = document.createElement("section");
+        card.className = "match";
+        card.innerHTML = `
+          <div class="rowTop">
+            <div class="day">
+              <div class="moon">🌙</div>
+              <div>
+                <div> ${m.day} رمضان</div>
+                <small>مباراة اليوم</small>
+              </div>
+            </div>
+            <div class="idtag">#${String(idx+1).padStart(2,"0")}</div>
+          </div>
+
+          <div class="teams">
+            <div class="team">${m.a}</div>
+            <div class="vs">VS</div>
+            <div class="team">${m.b}</div>
+          </div>
+
+          <div class="score">
+            <label>النتيجة:</label>
+            <div class="box">
+              <input type="number" min="0" step="1" inputmode="numeric" aria-label="نتيجة الفريق الأول"
+                     value="${s.a}" data-day="${m.day}" data-side="a" placeholder="0" />
+              <span class="dash">-</span>
+              <input type="number" min="0" step="1" inputmode="numeric" aria-label="نتيجة الفريق الثاني"
+                     value="${s.b}" data-day="${m.day}" data-side="b" placeholder="0" />
+            </div>
+          </div>
+        `;
+        root.appendChild(card);
+      });
+    }
+
+    function onInput(e){
+      const el = e.target;
+      if(el.tagName !== "INPUT") return;
+      const day = el.dataset.day;
+      const side = el.dataset.side;
+      const k = matchKey(day);
+      scores[k] = scores[k] || {a:"", b:""};
+      scores[k][side] = el.value;
+      saveScores(scores);
+    }
+
+    document.addEventListener("input", onInput);
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      if(!confirm("متأكد؟ هتمسح كل النتائج!")) return;
+      localStorage.removeItem(KEY);
+      location.reload();
+    });
+
+    document.getElementById("printBtn").addEventListener("click", () => {
+      window.print();
+    });
+
+    document.getElementById("exportBtn").addEventListener("click", () => {
+      const blob = new Blob([JSON.stringify(scores, null, 2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "ramadan-results.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    render();
+  </script>
+</body>
+</html>
