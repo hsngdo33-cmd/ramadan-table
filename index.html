@@ -4,19 +4,19 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>جدول بطولة رمضان</title>
-  <meta name="description" content="جدول بطولة رمضان - مواعيد المباريات وخانات النتائج" />
+  <meta name="description" content="جدول بطولة رمضان - مواعيد المباريات وخانات النتائج + ترتيب الفرق" />
   <style>
     :root{
       --bg1:#070a1a;
       --bg2:#0b1b3a;
       --card:#0f234a;
-      --card2:#0c1d3f;
       --text:#eef2ff;
       --muted:#b6c2ff;
       --gold:#ffd36a;
       --green:#47f0b3;
       --ring:rgba(255, 211, 106, .22);
       --shadow: 0 14px 50px rgba(0,0,0,.45);
+      --border: rgba(255,255,255,.12);
     }
     *{box-sizing:border-box}
     body{
@@ -30,8 +30,6 @@
         linear-gradient(180deg, var(--bg1), var(--bg2));
       min-height:100vh;
     }
-
-    /* subtle stars */
     .stars{
       position:fixed; inset:0; pointer-events:none; opacity:.55;
       background-image:
@@ -44,14 +42,12 @@
       background-size: 420px 320px;
       filter: blur(.1px);
     }
-
     .wrap{
       max-width: 980px;
       margin: 0 auto;
       padding: 22px 14px 44px;
       position:relative;
     }
-
     header{
       display:flex;
       flex-direction:column;
@@ -64,7 +60,6 @@
       box-shadow: 0 10px 30px rgba(0,0,0,.20);
       backdrop-filter: blur(6px);
     }
-
     .title{
       display:flex;
       align-items:center;
@@ -82,17 +77,8 @@
       font-size: 13px;
       letter-spacing:.3px;
     }
-    h1{
-      margin:0;
-      font-size: 22px;
-      font-weight: 900;
-    }
-    .sub{
-      margin:0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
+    h1{ margin:0; font-size: 22px; font-weight: 900; }
+    .sub{ margin:0; color: var(--muted); font-size: 14px; }
     .controls{
       display:flex;
       gap:10px;
@@ -121,12 +107,107 @@
       border-color: rgba(255,80,110,.25);
     }
 
+    /* Standings */
+    .section{
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .section:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background: radial-gradient(450px 180px at 15% 0%, rgba(71,240,179,.12), transparent 60%),
+                  radial-gradient(480px 180px at 95% 10%, rgba(255,211,106,.12), transparent 60%);
+      opacity:.8;
+      pointer-events:none;
+    }
+    .section > *{ position:relative; }
+    .sectionHead{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+    .sectionHead h2{
+      margin:0;
+      font-size: 18px;
+      font-weight: 1000;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .hint{
+      margin:0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .tableWrap{
+      overflow:auto;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+    }
+    table{
+      width:100%;
+      border-collapse: collapse;
+      min-width: 680px;
+    }
+    thead th{
+      position:sticky;
+      top:0;
+      background: rgba(15,35,74,.85);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid rgba(255,255,255,.12);
+      color: var(--text);
+      text-align:center;
+      padding: 12px 10px;
+      font-weight: 1000;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    tbody td{
+      text-align:center;
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      color: var(--text);
+      font-weight: 800;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    tbody tr:hover td{
+      background: rgba(255,211,106,.06);
+    }
+    .teamCell{
+      text-align:right !important;
+      font-weight: 1000;
+      color: #fff;
+    }
+    .rank{
+      font-weight: 1000;
+      color: var(--gold);
+    }
+    .pts{
+      font-weight: 1100;
+      color: var(--green);
+    }
+    .mutedCell{
+      color: var(--muted);
+      font-weight: 800;
+    }
+
     .grid{
       margin-top: 16px;
       display:grid;
       gap: 12px;
     }
-
     .match{
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border: 1px solid rgba(255,255,255,.10);
@@ -145,7 +226,6 @@
       pointer-events:none;
     }
     .match > *{ position:relative; }
-
     .rowTop{
       display:flex;
       align-items:center;
@@ -182,7 +262,6 @@
       font-weight: 800;
       font-size: 12px;
     }
-
     .teams{
       display:grid;
       grid-template-columns: 1fr auto 1fr;
@@ -209,7 +288,6 @@
       border: 1px solid rgba(255,211,106,.20);
       white-space:nowrap;
     }
-
     .score{
       display:flex;
       align-items:center;
@@ -252,7 +330,6 @@
       color: var(--gold);
       font-size: 18px;
     }
-
     footer{
       margin-top: 18px;
       padding: 14px 12px;
@@ -262,27 +339,27 @@
       text-align:center;
       background: rgba(255,255,255,.04);
     }
-
     @media (max-width: 560px){
       .teams{ grid-template-columns: 1fr; }
       .vs{ justify-self:center; }
       input[type="number"]{ width: 70px; }
+      table{ min-width: 720px; } /* easier scroll */
     }
-
-    /* Print */
     @media print{
       body{ background:#fff; color:#000; }
       .stars, .controls{ display:none !important; }
-      header, .match, footer{
+      header, .match, footer, .section{
         box-shadow:none !important;
         background:#fff !important;
         border:1px solid #ddd !important;
       }
-      .team, .box, input{ background:#fff !important; color:#000 !important; }
+      .team, .box, input, .tableWrap{ background:#fff !important; color:#000 !important; }
+      thead th{ background:#f3f3f3 !important; color:#000 !important; }
       .vs{ color:#b07a00 !important; }
     }
   </style>
 </head>
+
 <body>
   <div class="stars"></div>
 
@@ -290,9 +367,9 @@
     <header>
       <div class="title">
         <span class="badge">🌙 رمضان كريم</span>
-        <h1>جدول بطولة رمضان – مباريات + نتائج</h1>
+        <h1>جدول بطولة رمضان – مباريات + نتائج + ترتيب</h1>
       </div>
-      <p class="sub">اكتب النتيجة في الخانات… وبتتسجل تلقائيًا على نفس الجهاز ✅</p>
+      <p class="sub">اكتب النتيجة في الخانات… الترتيب بيتحدّث تلقائيًا ✅</p>
 
       <div class="controls">
         <button class="btn primary" id="printBtn">🖨️ طباعة / PDF</button>
@@ -300,6 +377,39 @@
         <button class="btn danger" id="resetBtn">🧹 مسح كل النتائج</button>
       </div>
     </header>
+
+    <!-- Standings -->
+    <section class="section" id="standingsSection">
+      <div class="sectionHead">
+        <div>
+          <h2>📊 جدول الترتيب</h2>
+          <p class="hint">الفوز = 3 نقاط • التعادل = 1 • الهزيمة = 0</p>
+        </div>
+        <p class="hint" id="standingsMeta">يتم التحديث مع إدخال النتائج</p>
+      </div>
+
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th style="text-align:right">الفريق</th>
+              <th>P</th>
+              <th>W</th>
+              <th>D</th>
+              <th>L</th>
+              <th>GF</th>
+              <th>GA</th>
+              <th>GD</th>
+              <th>Pts</th>
+            </tr>
+          </thead>
+          <tbody id="standingsBody">
+            <!-- rows -->
+          </tbody>
+        </table>
+      </div>
+    </section>
 
     <main class="grid" id="matches"></main>
 
@@ -333,7 +443,7 @@
       { day: 21, a: "اولاد حبيشي للجبس",          b: "أصدقاء مصطفي الشحات" },
     ];
 
-    const KEY = "ramadan_table_scores_v1";
+    const KEY = "ramadan_table_scores_v2";
 
     function loadScores(){
       try { return JSON.parse(localStorage.getItem(KEY) || "{}"); }
@@ -344,12 +454,102 @@
     }
 
     const scores = loadScores();
-    const root = document.getElementById("matches");
+    const matchesRoot = document.getElementById("matches");
+    const standingsBody = document.getElementById("standingsBody");
+    const standingsMeta = document.getElementById("standingsMeta");
 
     function matchKey(day){ return `day_${day}`; }
 
-    function render(){
-      root.innerHTML = "";
+    function isCompleteScore(x){
+      return x !== "" && x !== null && x !== undefined && !Number.isNaN(Number(x));
+    }
+
+    function getAllTeams(){
+      const set = new Set();
+      data.forEach(m => { set.add(m.a); set.add(m.b); });
+      return Array.from(set);
+    }
+
+    function emptyStats(){
+      return { P:0, W:0, D:0, L:0, GF:0, GA:0, GD:0, Pts:0 };
+    }
+
+    function computeStandings(){
+      const teams = getAllTeams();
+      const table = Object.fromEntries(teams.map(t => [t, emptyStats()]));
+
+      let playedMatches = 0;
+
+      data.forEach(m => {
+        const k = matchKey(m.day);
+        const s = scores[k] || { a:"", b:"" };
+        if(!isCompleteScore(s.a) || !isCompleteScore(s.b)) return;
+
+        const ga = Number(s.a);
+        const gb = Number(s.b);
+        if(ga < 0 || gb < 0) return;
+
+        playedMatches++;
+
+        // update played
+        table[m.a].P++; table[m.b].P++;
+        table[m.a].GF += ga; table[m.a].GA += gb;
+        table[m.b].GF += gb; table[m.b].GA += ga;
+
+        if(ga > gb){
+          table[m.a].W++; table[m.b].L++;
+          table[m.a].Pts += 3;
+        } else if(ga < gb){
+          table[m.b].W++; table[m.a].L++;
+          table[m.b].Pts += 3;
+        } else {
+          table[m.a].D++; table[m.b].D++;
+          table[m.a].Pts += 1;
+          table[m.b].Pts += 1;
+        }
+      });
+
+      // compute GD
+      for(const t of Object.keys(table)){
+        table[t].GD = table[t].GF - table[t].GA;
+      }
+
+      // sort: Pts desc, GD desc, GF desc, name asc
+      const rows = Object.entries(table).map(([team, st]) => ({ team, ...st }));
+      rows.sort((x,y) => {
+        if(y.Pts !== x.Pts) return y.Pts - x.Pts;
+        if(y.GD !== x.GD) return y.GD - x.GD;
+        if(y.GF !== x.GF) return y.GF - x.GF;
+        return x.team.localeCompare(y.team, "ar");
+      });
+
+      standingsMeta.textContent = `تم تسجيل ${playedMatches} مباراة من ${data.length}`;
+      return rows;
+    }
+
+    function renderStandings(){
+      const rows = computeStandings();
+      standingsBody.innerHTML = "";
+      rows.forEach((r, i) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="rank">${i+1}</td>
+          <td class="teamCell">${r.team}</td>
+          <td>${r.P}</td>
+          <td>${r.W}</td>
+          <td>${r.D}</td>
+          <td>${r.L}</td>
+          <td>${r.GF}</td>
+          <td>${r.GA}</td>
+          <td class="mutedCell">${r.GD}</td>
+          <td class="pts">${r.Pts}</td>
+        `;
+        standingsBody.appendChild(tr);
+      });
+    }
+
+    function renderMatches(){
+      matchesRoot.innerHTML = "";
       data.forEach((m, idx) => {
         const k = matchKey(m.day);
         const s = scores[k] || { a:"", b:"" };
@@ -361,7 +561,7 @@
             <div class="day">
               <div class="moon">🌙</div>
               <div>
-                <div> ${m.day} رمضان</div>
+                <div>${m.day} رمضان</div>
                 <small>مباراة اليوم</small>
               </div>
             </div>
@@ -377,33 +577,38 @@
           <div class="score">
             <label>النتيجة:</label>
             <div class="box">
-              <input type="number" min="0" step="1" inputmode="numeric" aria-label="نتيجة الفريق الأول"
+              <input type="number" min="0" step="1" inputmode="numeric"
                      value="${s.a}" data-day="${m.day}" data-side="a" placeholder="0" />
               <span class="dash">-</span>
-              <input type="number" min="0" step="1" inputmode="numeric" aria-label="نتيجة الفريق الثاني"
+              <input type="number" min="0" step="1" inputmode="numeric"
                      value="${s.b}" data-day="${m.day}" data-side="b" placeholder="0" />
             </div>
           </div>
         `;
-        root.appendChild(card);
+        matchesRoot.appendChild(card);
       });
     }
 
     function onInput(e){
       const el = e.target;
       if(el.tagName !== "INPUT") return;
+
       const day = el.dataset.day;
       const side = el.dataset.side;
       const k = matchKey(day);
+
       scores[k] = scores[k] || {a:"", b:""};
       scores[k][side] = el.value;
       saveScores(scores);
+
+      // Update standings live
+      renderStandings();
     }
 
     document.addEventListener("input", onInput);
 
     document.getElementById("resetBtn").addEventListener("click", () => {
-      if(!confirm("متأكد؟ هتمسح كل النتائج!")) return;
+      if(!confirm("متأكد؟ هتمسح كل النتائج والترتيب!")) return;
       localStorage.removeItem(KEY);
       location.reload();
     });
@@ -422,7 +627,9 @@
       URL.revokeObjectURL(url);
     });
 
-    render();
+    // initial
+    renderMatches();
+    renderStandings();
   </script>
 </body>
 </html>
