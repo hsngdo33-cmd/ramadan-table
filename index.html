@@ -5,7 +5,257 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>توقعات بطولة رمضان</title>
   <style>
-    /* التنسيق كما هو */
+    :root {
+      --bg: #070a1a;
+      --bg2: #0b1b3a;
+      --bd: rgba(255, 255, 255, .12);
+      --t: #eef2ff;
+      --m: #b6c2ff;
+      --g: #47f0b3;
+      --y: #ffd36a;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, Segoe UI, Tahoma, Arial, sans-serif;
+      color: var(--t);
+      background: radial-gradient(900px 500px at 80% 10%, rgba(71, 240, 179, .12), transparent 62%),
+                  radial-gradient(1200px 600px at 20% 10%, rgba(255, 211, 106, .14), transparent 60%),
+                  linear-gradient(180deg, var(--bg), var(--bg2));
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .03));
+      border: 1px solid var(--bd);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 14px 50px rgba(0, 0, 0, .45);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .muted {
+      color: var(--m);
+      font-weight: 700;
+      font-size: 13px;
+      margin: 6px 0 0;
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    input, button {
+      font: inherit;
+    }
+
+    .nameInput {
+      flex: 1;
+      min-width: 180px;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--bd);
+      background: rgba(255, 255, 255, .06);
+      color: var(--t);
+      font-weight: 900;
+    }
+
+    .btn {
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--bd);
+      background: rgba(255, 255, 255, .06);
+      color: var(--t);
+      font-weight: 1000;
+      cursor: pointer;
+    }
+
+    .btn.primary {
+      border-color: rgba(255, 211, 106, .32);
+      background: rgba(255, 211, 106, .10);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--bd);
+      background: rgba(255, 255, 255, .04);
+      font-weight: 1000;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: rgba(71, 240, 179, .10);
+      border-color: rgba(71, 240, 179, .22);
+      color: var(--g);
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .match {
+      border: 1px solid var(--bd);
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(0, 0, 0, .16);
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      padding: 6px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(124, 92, 255, .22);
+      background: rgba(124, 92, 255, .12);
+      color: #d9d4ff;
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .teams {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .team {
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--bd);
+      background: rgba(255, 255, 255, .05);
+      text-align: center;
+      font-weight: 1100;
+    }
+
+    .vs {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 211, 106, .20);
+      background: rgba(255, 211, 106, .10);
+      color: var(--y);
+      font-weight: 1200;
+    }
+
+    .score {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .box {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--bd);
+      background: rgba(255, 255, 255, .04);
+      border-radius: 14px;
+      padding: 10px;
+    }
+
+    .num {
+      width: 74px;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1px solid var(--bd);
+      background: rgba(255, 255, 255, .06);
+      color: var(--t);
+      font-weight: 1100;
+      text-align: center;
+    }
+
+    .dash {
+      color: var(--y);
+      font-weight: 1200;
+      font-size: 18px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--m);
+      font-weight: 800;
+    }
+
+    .tableWrap {
+      overflow: auto;
+      border-radius: 14px;
+      border: 1px solid var(--bd);
+      background: rgba(0, 0, 0, .16);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 640px;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, .08);
+      font-weight: 900;
+    }
+
+    th {
+      background: rgba(15, 35, 74, .85);
+      position: sticky;
+      top: 0;
+    }
+
+    td.nameCell {
+      text-align: right;
+    }
+
+    td.pts {
+      color: var(--g);
+      font-weight: 1200;
+    }
+
+    @media(max-width: 560px) {
+      .teams {
+        grid-template-columns: 1fr;
+      }
+      .vs {
+        justify-self: center;
+      }
+      .num {
+        width: 68px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -137,13 +387,11 @@
       const p = myPred[m.id] || { a: "", b: "" };
       const played = m.score_a !== null && m.score_b !== null;
 
-      // تحديد وقت المباراة: الساعة 4:00 عصرًا (أو توقيت المباراة)
-      const matchDate = new Date(`${m.day}T16:00:00`); // الساعة 4:00 عصرًا
+      // تحديد موعد المباراة: المباراة تفتح التوقعات في اليوم الذي يسبقها
+      const matchDate = new Date(`${m.day}T12:00:00`); // الساعة 12:00 ظهراً
       const currentDate = new Date(); // التاريخ الحالي
-
-      // تحديد إذا كانت المباراة القادمة هي مباراة الغد
       const tomorrow = new Date();
-      tomorrow.setDate(currentDate.getDate() + 1); // الغد
+      tomorrow.setDate(currentDate.getDate() + 1); // يوم غد
 
       const card = document.createElement("div");
       card.className = "match";
