@@ -13,6 +13,7 @@
       --m: #b6c2ff;
       --g: #47f0b3;
       --y: #ffd36a;
+      --accent: #7c5cff;
     }
 
     body {
@@ -37,12 +38,10 @@
       border-radius: 18px;
       padding: 14px;
       box-shadow: 0 14px 50px rgba(0, 0, 0, .45);
+      margin-bottom: 20px;
     }
 
-    h1 {
-      margin: 0;
-      font-size: 20px;
-    }
+    h1 { margin: 0; font-size: 20px; }
 
     .muted {
       color: var(--m);
@@ -59,9 +58,7 @@
       margin-top: 10px;
     }
 
-    input, button {
-      font: inherit;
-    }
+    input, button { font: inherit; }
 
     .nameInput {
       flex: 1;
@@ -82,7 +79,10 @@
       color: var(--t);
       font-weight: 1000;
       cursor: pointer;
+      transition: 0.2s;
     }
+
+    .btn:hover { background: rgba(255, 255, 255, .1); }
 
     .btn.primary {
       border-color: rgba(255, 211, 106, .32);
@@ -91,19 +91,23 @@
 
     .tabs {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       margin: 14px 0;
+      overflow-x: auto;
+      padding-bottom: 5px;
     }
 
     .tab {
       flex: 1;
+      min-width: 100px;
       text-align: center;
-      padding: 12px;
+      padding: 12px 8px;
       border-radius: 14px;
       border: 1px solid var(--bd);
       background: rgba(255, 255, 255, .04);
       font-weight: 1000;
       cursor: pointer;
+      white-space: nowrap;
     }
 
     .tab.active {
@@ -112,10 +116,7 @@
       color: var(--g);
     }
 
-    .grid {
-      display: grid;
-      gap: 12px;
-    }
+    .grid { display: grid; gap: 12px; }
 
     .match {
       border: 1px solid var(--bd);
@@ -129,7 +130,6 @@
       justify-content: space-between;
       align-items: center;
       gap: 10px;
-      flex-wrap: wrap;
     }
 
     .tag {
@@ -139,7 +139,7 @@
       background: rgba(124, 92, 255, .12);
       color: #d9d4ff;
       font-weight: 900;
-      font-size: 12px;
+      font-size: 11px;
     }
 
     .teams {
@@ -166,6 +166,7 @@
       background: rgba(255, 211, 106, .10);
       color: var(--y);
       font-weight: 1200;
+      font-size: 14px;
     }
 
     .score {
@@ -174,7 +175,6 @@
       gap: 10px;
       align-items: center;
       margin-top: 12px;
-      flex-wrap: wrap;
     }
 
     .box {
@@ -184,13 +184,13 @@
       border: 1px solid var(--bd);
       background: rgba(255, 255, 255, .04);
       border-radius: 14px;
-      padding: 10px;
+      padding: 8px;
     }
 
     .num {
-      width: 74px;
-      padding: 10px;
-      border-radius: 12px;
+      width: 50px;
+      padding: 8px;
+      border-radius: 10px;
       border: 1px solid var(--bd);
       background: rgba(255, 255, 255, .06);
       color: var(--t);
@@ -198,63 +198,37 @@
       text-align: center;
     }
 
-    .dash {
-      color: var(--y);
-      font-weight: 1200;
-      font-size: 18px;
-    }
-
-    .small {
-      font-size: 12px;
-      color: var(--m);
-      font-weight: 800;
-    }
-
     .tableWrap {
-      overflow: auto;
+      overflow-x: auto;
       border-radius: 14px;
       border: 1px solid var(--bd);
       background: rgba(0, 0, 0, .16);
+      margin-top: 12px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 640px;
+      min-width: 500px;
     }
 
     th, td {
-      padding: 10px;
+      padding: 12px;
       text-align: center;
       border-bottom: 1px solid rgba(255, 255, 255, .08);
-      font-weight: 900;
+      font-weight: 800;
     }
 
-    th {
-      background: rgba(15, 35, 74, .85);
-      position: sticky;
-      top: 0;
-    }
-
-    td.nameCell {
-      text-align: right;
-    }
-
-    td.pts {
-      color: var(--g);
-      font-weight: 1200;
-    }
+    th { background: rgba(15, 35, 74, .85); font-size: 13px; color: var(--m); }
+    
+    .nameCell { text-align: right !important; }
+    .pts { color: var(--g); font-weight: 1200; }
+    .highlight { color: var(--y); }
 
     @media(max-width: 560px) {
-      .teams {
-        grid-template-columns: 1fr;
-      }
-      .vs {
-        justify-self: center;
-      }
-      .num {
-        width: 68px;
-      }
+      .teams { grid-template-columns: 1fr; }
+      .vs { justify-self: center; }
+      table { min-width: 450px; font-size: 13px; }
     }
   </style>
 </head>
@@ -267,38 +241,62 @@
       <div class="row">
         <input class="nameInput" id="name" placeholder="اكتب اسمك..." />
         <button class="btn primary" id="saveName">حفظ الاسم</button>
-        <button class="btn" id="clearMe">تغيير الاسم</button>
+        <button class="btn" id="clearMe">تغيير</button>
       </div>
 
       <div class="row">
-        <div class="small" id="meInfo">—</div>
+        <div class="small" id="meInfo" style="font-size: 12px; opacity: 0.8;">—</div>
       </div>
     </div>
 
     <div class="tabs">
       <div class="tab active" data-tab="matches">المباريات</div>
-      <div class="tab" data-tab="leaderboard">الترتيب</div>
+      <div class="tab" data-tab="teams-standings">ترتيب الفرق</div>
+      <div class="tab" data-tab="leaderboard">ترتيب المتوقعين</div>
     </div>
 
+    <!-- قسم المباريات -->
     <div id="matches" class="grid"></div>
 
-    <div id="leaderboard" class="card" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap">
-        <div>
-          <h1 style="margin:0">📊 جدول النقاط</h1>
-          <div class="muted">3 للناتج الصح • 1 للاتجاه الصح (فائز/تعادل) • 0 غلط</div>
-        </div>
-        <button class="btn" id="refreshLb">تحديث</button>
-      </div>
-
-      <div class="tableWrap" style="margin-top:12px">
+    <!-- قسم ترتيب الفرق (الدوري) -->
+    <div id="teams-standings" class="card" style="display:none">
+      <h1 style="margin-bottom:4px">🏆 جدول ترتيب البطولة</h1>
+      <p class="muted">يتم التحديث بناءً على النتائج الرسمية للمباريات.</p>
+      <div class="tableWrap">
         <table>
           <thead>
             <tr>
               <th>#</th>
-              <th style="text-align:right">الاسم</th>
-              <th>Points</th>
-              <th>Matches Scored</th>
+              <th class="nameCell">الفريق</th>
+              <th>لعب</th>
+              <th>ف</th>
+              <th>ت</th>
+              <th>خ</th>
+              <th>له</th>
+              <th>عليه</th>
+              <th>النقاط</th>
+            </tr>
+          </thead>
+          <tbody id="teamsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- قسم ترتيب المتوقعين -->
+    <div id="leaderboard" class="card" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <h1>📊 ترتيب المتوقعين</h1>
+        <button class="btn" id="refreshLb" style="padding: 6px 12px; font-size: 12px;">تحديث</button>
+      </div>
+      <p class="muted">3 للنتيجة • 1 للاتجاه • 0 غلط</p>
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th class="nameCell">المتوقع</th>
+              <th>النقاط</th>
+              <th>مباريات صحيحة</th>
             </tr>
           </thead>
           <tbody id="lbBody"></tbody>
@@ -308,79 +306,56 @@
   </div>
 
 <script type="module">
-  // بيانات المشروع
   const SUPABASE_URL = "https://pigzomxrtrytcvqfqgow.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_VgS6EQA7Eb9ZSmpBPj1Olg_Ndwch13s";
 
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const ME_KEY = "ramadan_me_v1"; // {participant_id, name}
+  const ME_KEY = "ramadan_me_v1";
 
+  // العناصر
   const matchesRoot = document.getElementById("matches");
-  const lbCard = document.getElementById("leaderboard");
+  const teamsStandingsCard = document.getElementById("teams-standings");
+  const leaderboardCard = document.getElementById("leaderboard");
   const lbBody = document.getElementById("lbBody");
+  const teamsBody = document.getElementById("teamsBody");
   const meInfo = document.getElementById("meInfo");
 
-  function getMe() {
-    try { return JSON.parse(localStorage.getItem(ME_KEY) || "null"); } catch { return null; }
-  }
-
+  function getMe() { try { return JSON.parse(localStorage.getItem(ME_KEY) || "null"); } catch { return null; } }
   function setMe(v) { localStorage.setItem(ME_KEY, JSON.stringify(v)); }
   function clearMe() { localStorage.removeItem(ME_KEY); }
 
   function showMe() {
     const me = getMe();
-    meInfo.textContent = me ? `✅ اسمك: ${me.name}` : "⚠️ اكتب اسمك واضغط حفظ";
+    meInfo.textContent = me ? `✅ اسمك المسجل: ${me.name}` : "⚠️ يرجى حفظ اسمك للمشاركة في التوقعات";
   }
 
   async function ensureParticipant() {
     const name = document.getElementById("name").value.trim();
     if (!name) return alert("اكتب اسمك الأول");
 
-    const { data, error } = await supabase
-      .from("participants")
-      .select("id, name")
-      .eq("name", name)
-      .single();
+    const { data, error } = await supabase.from("participants").select("id, name").eq("name", name).single();
 
     if (data) {
-      // إذا كان الاسم موجودًا بالفعل
       setMe({ participant_id: data.id, name: data.name });
-      showMe();
-      loadMatches();  // عند إضافة البيانات السابقة بنعيد تحميل المباريات.
     } else {
-      // إذا كان الاسم غير موجود
-      const { data: newData, error: insertError } = await supabase
-        .from("participants")
-        .insert({ name })
-        .select("id, name")
-        .single();
-
+      const { data: newData, error: insertError } = await supabase.from("participants").insert({ name }).select("id, name").single();
       if (insertError) return alert("حدث خطأ أثناء إضافة الاسم");
-
       setMe({ participant_id: newData.id, name: newData.name });
-      showMe();
-      loadMatches();  // عند إضافة مستخدم جديد بنقوم بتحميل المباريات.
     }
+    showMe();
+    loadMatches();
   }
 
   async function loadMatches() {
-    const { data: matches, error } = await supabase
-      .from("matches")
-      .select("id, day, team_a, team_b, score_a, score_b")
-      .order("day", { ascending: true });
-
-    if (error) return alert("مشكلة في تحميل المباريات");
+    const { data: matches, error } = await supabase.from("matches").select("*").order("day", { ascending: true });
+    if (error) return;
 
     const me = getMe();
     let myPred = {};
     if (me) {
-      const { data: preds } = await supabase
-        .from("predictions")
-        .select("match_id, pred_a, pred_b")
-        .eq("participant_id", me.participant_id);
-
+      const { data: preds } = await supabase.from("predictions").select("match_id, pred_a, pred_b").eq("participant_id", me.participant_id);
       (preds || []).forEach(p => myPred[p.match_id] = { a: p.pred_a, b: p.pred_b });
     }
 
@@ -394,96 +369,131 @@
       card.innerHTML = `
         <div class="top">
           <div style="font-weight:1100">🌙 ${m.day} رمضان</div>
-          <div class="tag">#${String(idx + 1).padStart(2, "0")}</div>
+          <div class="tag">مباراة ${idx + 1}</div>
         </div>
-
         <div class="teams">
           <div class="team">${m.team_a}</div>
           <div class="vs">VS</div>
           <div class="team">${m.team_b}</div>
         </div>
-
         <div class="score">
-          <div class="small">${played ? `✅ النتيجة الرسمية: ${m.score_a} - ${m.score_b}` : "⌛ لم تُسجل النتيجة بعد"}</div>
+          <div class="small" style="color:var(--m)">${played ? `النتيجة: ${m.score_a} - ${m.score_b}` : "⌛ في انتظار المباراة"}</div>
         </div>
-
-        <div class="score" style="margin-top:10px">
-          <div class="small">توقعك:</div>
+        <div class="score" style="margin-top:10px; flex-direction:column">
           <div class="box">
-            <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.a}"
-              data-match="${m.id}" data-side="a" placeholder="" ${me ? "" : "disabled"} />
-            <span class="dash">-</span>
-            <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.b}"
-              data-match="${m.id}" data-side="b" placeholder="" ${me ? "" : "disabled"} />
+            <input class="num" type="number" value="${p.a}" data-match="${m.id}" data-side="a" ${me ? "" : "disabled"} />
+            <span style="color:var(--y)">-</span>
+            <input class="num" type="number" value="${p.b}" data-match="${m.id}" data-side="b" ${me ? "" : "disabled"} />
+            <button class="btn primary" style="padding: 8px 12px; font-size:12px" data-save="${m.id}" ${me ? "" : "disabled"}>حفظ</button>
           </div>
-          <button class="btn primary" data-save="${m.id}" ${me ? "" : "disabled"}>حفظ</button>
         </div>
-
-        ${me ? "" : `<div class="small" style="margin-top:10px">⚠️ احفظ اسمك أولاً عشان تقدر تكتب توقعاتك</div>`}
       `;
       matchesRoot.appendChild(card);
     });
+    
+    // حساب جدول ترتيب الفرق تلقائياً من النتائج الرسمية
+    generateTeamsTable(matches);
   }
 
-  // حفظ التوقعات في قاعدة البيانات
-  async function savePrediction(matchId) {
-    const me = getMe();
-    if (!me) return alert("الرجاء حفظ اسمك أولاً");
+  function generateTeamsTable(matches) {
+    const stats = {};
 
-    const predA = document.querySelector(`input[data-match="${matchId}"][data-side="a"]`).value;
-    const predB = document.querySelector(`input[data-match="${matchId}"][data-side="b"]`).value;
+    matches.forEach(m => {
+      if (m.score_a === null || m.score_b === null) return;
+      
+      [m.team_a, m.team_b].forEach(t => {
+        if (!stats[t]) stats[t] = { name: t, pld: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
+      });
 
-    const { error } = await supabase
-      .from("predictions")
-      .upsert({ participant_id: me.participant_id, match_id: matchId, pred_a: predA, pred_b: predB });
+      const sA = parseInt(m.score_a);
+      const sB = parseInt(m.score_b);
 
-    if (error) return alert("حدث خطأ أثناء حفظ التوقعات");
+      stats[m.team_a].pld++;
+      stats[m.team_b].pld++;
+      stats[m.team_a].gf += sA;
+      stats[m.team_a].ga += sB;
+      stats[m.team_b].gf += sB;
+      stats[m.team_b].ga += sA;
 
-    alert("تم حفظ التوقعات");
-  }
+      if (sA > sB) {
+        stats[m.team_a].w++; stats[m.team_a].pts += 3;
+        stats[m.team_b].l++;
+      } else if (sA < sB) {
+        stats[m.team_b].w++; stats[m.team_b].pts += 3;
+        stats[m.team_a].l++;
+      } else {
+        stats[m.team_a].d++; stats[m.team_a].pts += 1;
+        stats[m.team_b].d++; stats[m.team_b].pts += 1;
+      }
+    });
 
-  async function loadLeaderboard() {
-    const { data, error } = await supabase
-      .from("leaderboard")
-      .select("name, points, matches_scored")
-      .order("points", { ascending: false });
+    const sorted = Object.values(stats).sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
 
-    if (error) return alert("مشكلة في تحميل الترتيب");
-
-    lbBody.innerHTML = "";
-    data.forEach((r, i) => {
+    teamsBody.innerHTML = sorted.length ? "" : "<tr><td colspan='9'>لا توجد نتائج مسجلة بعد</td></tr>";
+    sorted.forEach((t, i) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${i + 1}</td>
-        <td class="nameCell">${r.name}</td>
-        <td class="pts">${r.points}</td>
-        <td>${r.matches_scored}</td>
+        <td class="nameCell">${t.name}</td>
+        <td>${t.pld}</td>
+        <td>${t.w}</td>
+        <td>${t.d}</td>
+        <td>${t.l}</td>
+        <td>${t.gf}</td>
+        <td>${t.ga}</td>
+        <td class="pts">${t.pts}</td>
       `;
+      teamsBody.appendChild(tr);
+    });
+  }
+
+  async function savePrediction(matchId) {
+    const me = getMe();
+    if (!me) return;
+    const pA = document.querySelector(`input[data-match="${matchId}"][data-side="a"]`).value;
+    const pB = document.querySelector(`input[data-match="${matchId}"][data-side="b"]`).value;
+    if(pA === "" || pB === "") return alert("ضع توقعاً كاملاً");
+
+    const { error } = await supabase.from("predictions").upsert({ 
+      participant_id: me.participant_id, 
+      match_id: matchId, 
+      pred_a: parseInt(pA), 
+      pred_b: parseInt(pB) 
+    });
+    if (error) alert("خطأ في الحفظ");
+    else alert("تم حفظ توقعك بنجاح ✅");
+  }
+
+  async function loadLeaderboard() {
+    const { data, error } = await supabase.from("leaderboard").select("*").order("points", { ascending: false });
+    if (error) return;
+    lbBody.innerHTML = "";
+    data.forEach((r, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${i + 1}</td><td class="nameCell">${r.name}</td><td class="pts">${r.points}</td><td>${r.matches_scored}</td>`;
       lbBody.appendChild(tr);
     });
   }
 
-  // Tabs
+  // التحكم في التبويبات
   document.querySelectorAll(".tab").forEach(t => {
     t.addEventListener("click", async () => {
       document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
       t.classList.add("active");
+      
       const tab = t.dataset.tab;
+      matchesRoot.style.display = (tab === "matches") ? "grid" : "none";
+      teamsStandingsCard.style.display = (tab === "teams-standings") ? "block" : "none";
+      leaderboardCard.style.display = (tab === "leaderboard") ? "block" : "none";
 
-      if (tab === "matches") {
-        lbCard.style.display = "none";
-        matchesRoot.style.display = "grid";
-      } else {
-        matchesRoot.style.display = "none";
-        lbCard.style.display = "block";
-        await loadLeaderboard();
-      }
+      if (tab === "leaderboard") await loadLeaderboard();
+      if (tab === "teams-standings") await loadMatches();
     });
   });
 
-  // Buttons
   document.getElementById("saveName").addEventListener("click", ensureParticipant);
   document.getElementById("clearMe").addEventListener("click", () => {
+    if(!confirm("هل تريد تغيير الاسم؟")) return;
     clearMe();
     document.getElementById("name").value = "";
     showMe();
@@ -492,15 +502,14 @@
 
   document.addEventListener("click", (e) => {
     const btn = e.target.closest("button[data-save]");
-    if (!btn) return;
-    savePrediction(Number(btn.dataset.save));
+    if (btn) savePrediction(Number(btn.dataset.save));
   });
 
   document.getElementById("refreshLb").addEventListener("click", loadLeaderboard);
 
-  // Init
+  // تشغيل أولي
   showMe();
-  await loadMatches();
+  loadMatches();
 </script>
 </body>
 </html>
