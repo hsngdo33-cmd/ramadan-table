@@ -72,6 +72,14 @@
   const lbBody = document.getElementById("lbBody");
   const meInfo = document.getElementById("meInfo");
 
+  // دالة لإدخال المباريات يدويًا
+  const matchesData = [
+    { day: "2026-02-18", team_a: "فريق 1", team_b: "فريق 2", score_a: null, score_b: null },
+    { day: "2026-02-19", team_a: "فريق 3", team_b: "فريق 4", score_a: null, score_b: null },
+    { day: "2026-02-20", team_a: "فريق 5", team_b: "فريق 6", score_a: null, score_b: null },
+    // أضف المزيد من المباريات هنا
+  ];
+
   function getMe() {
     try { return JSON.parse(localStorage.getItem(ME_KEY) || "null"); } catch { return null; }
   }
@@ -114,13 +122,6 @@
   }
 
   async function loadMatches() {
-    const { data: matches, error } = await supabase
-      .from("matches")
-      .select("id, day, team_a, team_b, score_a, score_b")
-      .order("day", { ascending: true });
-
-    if (error) return alert("مشكلة في تحميل المباريات");
-
     const me = getMe();
     let myPred = {};
     if (me) {
@@ -133,17 +134,17 @@
     }
 
     matchesRoot.innerHTML = "";
-    matches.forEach((m, idx) => {
+    matchesData.forEach((m, idx) => {
       const p = myPred[m.id] || { a: "", b: "" };
       const played = m.score_a !== null && m.score_b !== null;
 
-      // تحديد موعد المباراة: المباراة تفتح التوقعات في اليوم الذي يسبقها
-      const matchDate = new Date(`${m.day}T12:00:00`); // الساعة 12:00 ظهراً
+      const matchDate = new Date(m.day); // تاريخ المباراة
       const currentDate = new Date(); // التاريخ الحالي
+
+      // تحقق من تاريخ المباراة، إذا كان اليوم الذي يسبق المباراة فقط هو المتاح للتوقع
       const tomorrow = new Date();
       tomorrow.setDate(currentDate.getDate() + 1); // يوم غد
 
-      // تحقق مما إذا كانت المباراة هي المباراة التي ستلعب غدًا
       const card = document.createElement("div");
       card.className = "match";
       card.innerHTML = `
