@@ -351,24 +351,55 @@
     await loadMatches();
   }
 
-  async function loadMatches() {
+ async function loadMatches() {
     const { data: matches, error } = await supabase
-      .from("matches")
-      .select("id, day, team_a, team_b, score_a, score_b")
-      .order("day", { ascending: true });
+        .from("matches")
+        .select("id, day, team_a, team_b, score_a, score_b")
+        .order("day", { ascending: true });
 
     if (error) return alert("مشكلة في تحميل المباريات");
 
-    const me = getMe();
-    let myPred = {};
-    if (me) {
-      const { data: preds } = await supabase
-        .from("predictions")
-        .select("match_id, pred_a, pred_b")
-        .eq("participant_id", me.participant_id);
+    // سيتم مسح المباريات الحالية قبل إضافتها من جديد
+    matchesRoot.innerHTML = "";
 
-      (preds || []).forEach(p => myPred[p.match_id] = { a: p.pred_a, b: p.pred_b });
-    }
+    matches.forEach((m, idx) => {
+        // تحقق إذا كانت المباراة موجودة بالفعل
+        const card = document.createElement("div");
+        card.className = "match";
+        card.innerHTML = `
+            <div class="top">
+                <div style="font-weight:1100">🌙 ${m.day} رمضان</div>
+                <div class="tag">#${String(idx + 1).padStart(2, "0")}</div>
+            </div>
+
+            <div class="teams">
+                <div class="team">${m.team_a}</div>
+                <div class="vs">VS</div>
+                <div class="team">${m.team_b}</div>
+            </div>
+
+            <div class="score">
+                <div class="small">${m.score_a !== null && m.score_b !== null ? `✅ النتيجة الرسمية: ${m.score_a} - ${m.score_b}` : "⌛ لم تُسجل النتيجة بعد"}</div>
+            </div>
+
+            <div class="score" style="margin-top:10px">
+                <div class="small">توقعك:</div>
+                <div class="box">
+                    <input class="num" type="number" min="0" step="1" inputmode="numeric" value=""
+                        data-match="${m.id}" data-side="a" placeholder="0" />
+                    <span class="dash">-</span>
+                    <input class="num" type="number" min="0" step="1" inputmode="numeric" value=""
+                        data-match="${m.id}" data-side="b" placeholder="0" />
+                </div>
+                <button class="btn primary" data-save="${m.id}">حفظ</button>
+            </div>
+
+            ${me ? "" : `<div class="small" style="margin-top:10px">⚠️ احفظ اسمك أولاً عشان تقدر تكتب توقعاتك</div>`}
+        `;
+
+        matchesRoot.appendChild(card);
+    });
+}
 
     matchesRoot.innerHTML = "";
     matches.forEach((m, idx) => {
