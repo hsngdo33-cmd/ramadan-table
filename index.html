@@ -140,6 +140,7 @@
       const matchDate = new Date(m.day); // تاريخ المباراة
       const currentDate = new Date(); // التاريخ الحالي
 
+      // التحقق من المباراة التي يمكن التوقع عليها (قبل المباراة بـ 24 ساعة)
       const tomorrow = new Date();
       tomorrow.setDate(currentDate.getDate() + 1); // يوم غد
 
