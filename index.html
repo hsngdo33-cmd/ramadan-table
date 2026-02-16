@@ -166,10 +166,10 @@
           <div class="small">توقعك:</div>
           <div class="box">
             <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.a}"
-              data-match="${m.id}" data-side="a" placeholder="" ${me && currentDate < matchDate && m.day === tomorrow.toLocaleDateString() ? "" : "disabled"} />
+              data-match="${m.id}" data-side="a" placeholder="0" ${me && currentDate < matchDate && m.day === tomorrow.toLocaleDateString() ? "" : "disabled"} />
             <span class="dash">-</span>
             <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.b}"
-              data-match="${m.id}" data-side="b" placeholder="" ${me && currentDate < matchDate && m.day === tomorrow.toLocaleDateString() ? "" : "disabled"} />
+              data-match="${m.id}" data-side="b" placeholder="0" ${me && currentDate < matchDate && m.day === tomorrow.toLocaleDateString() ? "" : "disabled"} />
           </div>
           <button class="btn primary" data-save="${m.id}" ${me && currentDate < matchDate && m.day === tomorrow.toLocaleDateString() ? "" : "disabled"}>حفظ</button>
         </div>
