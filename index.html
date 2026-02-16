@@ -308,13 +308,14 @@
   </div>
 
 <script type="module">
+  // بيانات المشروع
   const SUPABASE_URL = "https://pigzomxrtrytcvqfqgow.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_VgS6EQA7Eb9ZSmpBPj1Olg_Ndwch13s";
 
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const ME_KEY = "ramadan_me_v1";
+  const ME_KEY = "ramadan_me_v1"; // {participant_id, name}
 
   const matchesRoot = document.getElementById("matches");
   const lbCard = document.getElementById("leaderboard");
@@ -339,27 +340,15 @@
 
     const { data, error } = await supabase
       .from("participants")
+      .insert({ name })
       .select("id, name")
-      .eq("name", name)
       .single();
 
-    if (data) {
-      setMe({ participant_id: data.id, name: data.name });
-      showMe();
-      loadMatches();
-    } else {
-      const { data: newData, error: insertError } = await supabase
-        .from("participants")
-        .insert({ name })
-        .select("id, name")
-        .single();
+    if (error) return alert("حصل خطأ في حفظ الاسم");
 
-      if (insertError) return alert("حدث خطأ أثناء إضافة الاسم");
-
-      setMe({ participant_id: newData.id, name: newData.name });
-      showMe();
-      loadMatches();
-    }
+    setMe({ participant_id: data.id, name: data.name });
+    showMe();
+    await loadMatches();
   }
 
   async function loadMatches() {
@@ -382,17 +371,9 @@
     }
 
     matchesRoot.innerHTML = "";
-    const today = new Date(); // Get the current date
-    const todayStr = today.toISOString().split("T")[0]; // Format as YYYY-MM-DD
-    today.setDate(today.getDate() + 1); // Set to tomorrow for prediction
-
     matches.forEach((m, idx) => {
       const p = myPred[m.id] || { a: "", b: "" };
-      const matchDate = new Date(m.day); // Get the match date
-
-      // Allow prediction only before match starts
-      const canPredict = matchDate > today && matchDate.getDate() !== today.getDate();
-      const isMatchToday = matchDate.toISOString().split("T")[0] === todayStr; 
+      const played = m.score_a !== null && m.score_b !== null;
 
       const card = document.createElement("div");
       card.className = "match";
@@ -409,19 +390,19 @@
         </div>
 
         <div class="score">
-          <div class="small">${m.score_a !== null && m.score_b !== null ? `✅ النتيجة الرسمية: ${m.score_a} - ${m.score_b}` : "⌛ لم تُسجل النتيجة بعد"}</div>
+          <div class="small">${played ? `✅ النتيجة الرسمية: ${m.score_a} - ${m.score_b}` : "⌛ لم تُسجل النتيجة بعد"}</div>
         </div>
 
         <div class="score" style="margin-top:10px">
           <div class="small">توقعك:</div>
           <div class="box">
             <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.a}"
-              data-match="${m.id}" data-side="a" placeholder="0" ${canPredict ? "" : "disabled"} />
+              data-match="${m.id}" data-side="a" placeholder="0" ${me ? "" : "disabled"} />
             <span class="dash">-</span>
             <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.b}"
-              data-match="${m.id}" data-side="b" placeholder="0" ${canPredict ? "" : "disabled"} />
+              data-match="${m.id}" data-side="b" placeholder="0" ${me ? "" : "disabled"} />
           </div>
-          <button class="btn primary" data-save="${m.id}" ${canPredict ? "" : "disabled"}>حفظ</button>
+          <button class="btn primary" data-save="${m.id}" ${me ? "" : "disabled"}>حفظ</button>
         </div>
 
         ${me ? "" : `<div class="small" style="margin-top:10px">⚠️ احفظ اسمك أولاً عشان تقدر تكتب توقعاتك</div>`}
