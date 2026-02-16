@@ -210,13 +210,6 @@
       font-weight: 800;
     }
 
-    .countdown {
-      margin-top: 10px;
-      font-size: 14px;
-      color: var(--y);
-      font-weight: bold;
-    }
-
     .tableWrap {
       overflow: auto;
       border-radius: 14px;
@@ -391,24 +384,10 @@
       (preds || []).forEach(p => myPred[p.match_id] = { a: p.pred_a, b: p.pred_b });
     }
 
-    // احصل على تاريخ اليوم
-    const today = new Date(); // يشمل الوقت الحالي
-    const todayDate = today.toISOString().split('T')[0]; // الشكل YYYY-MM-DD (لتاريخ اليوم بدون الوقت)
-
     matchesRoot.innerHTML = "";
     matches.forEach((m, idx) => {
       const p = myPred[m.id] || { a: "", b: "" };
       const played = m.score_a !== null && m.score_b !== null;
-
-      // تحقق إذا كانت المباراة هي مباراة اليوم
-      const matchDate = new Date(m.day); // تاريخ المباراة مع الوقت
-      const isToday = matchDate.toISOString().split('T')[0] === todayDate; // تأكد أن التاريخ هو نفسه بدون الوقت
-
-      // حساب الوقت المتبقي للمباراة
-      const timeLeft = matchDate.getTime() - today.getTime();
-      const hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
-      const minutesLeft = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-      const secondsLeft = Math.floor((timeLeft % (1000 * 60)) / 1000);
 
       const card = document.createElement("div");
       card.className = "match";
@@ -432,16 +411,12 @@
           <div class="small">توقعك:</div>
           <div class="box">
             <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.a}"
-              data-match="${m.id}" data-side="a" placeholder="" ${isToday || me ? "" : "disabled"} />
+              data-match="${m.id}" data-side="a" placeholder="" ${me ? "" : "disabled"} />
             <span class="dash">-</span>
             <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.b}"
-              data-match="${m.id}" data-side="b" placeholder="" ${isToday || me ? "" : "disabled"} />
+              data-match="${m.id}" data-side="b" placeholder="" ${me ? "" : "disabled"} />
           </div>
-          <button class="btn primary" data-save="${m.id}" ${isToday || me ? "" : "disabled"}>حفظ</button>
-        </div>
-
-        <div class="countdown" style="margin-top: 10px;">
-          ${timeLeft > 0 ? `⏳ الوقت المتبقي: ${hoursLeft} ساعة و ${minutesLeft} دقيقة و ${secondsLeft} ثانية` : "🛑 انتهت التوقعات"}
+          <button class="btn primary" data-save="${m.id}" ${me ? "" : "disabled"}>حفظ</button>
         </div>
 
         ${me ? "" : `<div class="small" style="margin-top:10px">⚠️ احفظ اسمك أولاً عشان تقدر تكتب توقعاتك</div>`}
