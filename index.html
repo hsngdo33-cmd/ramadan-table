@@ -322,7 +322,40 @@
   </div>
 
 <script type="module">
-  // البيانات المتعلقة بالفرق
+  // البيانات المتعلقة بـ Supabase
+  const SUPABASE_URL = "https://pigzomxrtrytcvqfqgow.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_VgS6EQA7Eb9ZSmpBPj1Olg_Ndwch13s";
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // المتغيرات الأساسية
+  const lbCard = document.getElementById("leaderboard");
+  const matchesRoot = document.getElementById("matches");
+  const meInfo = document.getElementById("meInfo");
+  const lbBody = document.getElementById("lbBody");
+  const teamLeaderboard = document.getElementById("teamLeaderboard");
+
+  async function loadLeaderboard() {
+    const { data, error } = await supabase
+      .from("leaderboard")
+      .select("name, points, matches_scored")
+      .order("points", { ascending: false });
+
+    if (error) return alert("مشكلة في تحميل الترتيب");
+
+    lbBody.innerHTML = "";
+    data.forEach((r, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i + 1}</td>
+        <td class="nameCell">${r.name}</td>
+        <td class="pts">${r.points}</td>
+        <td>${r.matches_scored}</td>
+      `;
+      lbBody.appendChild(tr);
+    });
+  }
+
   async function loadTeamLeaderboard() {
     const { data, error } = await supabase
       .from("matches")
@@ -342,7 +375,6 @@
     });
 
     // عرض الفرق في الترتيب
-    const teamLeaderboard = document.getElementById("teamLeaderboard");
     teamLeaderboard.innerHTML = "";
 
     let idx = 1;
@@ -357,29 +389,6 @@
     });
   }
 
-  // البيانات المتعلقة باللاعبين
-  async function loadLeaderboard() {
-    const { data, error } = await supabase
-      .from("leaderboard")
-      .select("name, points, matches_scored")
-      .order("points", { ascending: false });
-
-    if (error) return alert("مشكلة في تحميل الترتيب");
-
-    const lbBody = document.getElementById("lbBody");
-    lbBody.innerHTML = "";
-    data.forEach((r, i) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${i + 1}</td>
-        <td class="nameCell">${r.name}</td>
-        <td class="pts">${r.points}</td>
-        <td>${r.matches_scored}</td>
-      `;
-      lbBody.appendChild(tr);
-    });
-  }
-
   // تفعيل التبويبات
   document.querySelectorAll(".tab").forEach(t => {
     t.addEventListener("click", async () => {
@@ -388,11 +397,11 @@
       const tab = t.dataset.tab;
 
       if (tab === "matches") {
-        document.getElementById("leaderboard").style.display = "none";
-        document.getElementById("matches").style.display = "grid";
+        lbCard.style.display = "none";
+        matchesRoot.style.display = "grid";
       } else {
-        document.getElementById("matches").style.display = "none";
-        document.getElementById("leaderboard").style.display = "block";
+        matchesRoot.style.display = "none";
+        lbCard.style.display = "block";
         await loadLeaderboard();
         await loadTeamLeaderboard();  // تحميل ترتيب الفرق
       }
