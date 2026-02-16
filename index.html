@@ -353,7 +353,7 @@
       showMe();
       await loadMatches();
     } else {
-      // إضافة المستخدم إلى قاعدة البيانات
+      // إضافة المستخدم إلى قاعدة البيانات إذا لم يكن موجودًا
       const { data: newUser, error: insertError } = await supabase
         .from("participants")
         .insert({ name })
