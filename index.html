@@ -349,12 +349,24 @@
     }
 
     if (data) {
-      // إذا كان الاسم موجودًا، حفظ بيانات المستخدم
       setMe({ participant_id: data.id, name: data.name });
       showMe();
       await loadMatches();
     } else {
-      alert("لا يوجد مستخدم بهذا الاسم، تأكد من الكتابة الصحيحة");
+      // إضافة المستخدم إلى قاعدة البيانات
+      const { data: newUser, error: insertError } = await supabase
+        .from("participants")
+        .insert({ name })
+        .select("id, name")
+        .single();
+
+      if (insertError) {
+        return alert("حدث خطأ أثناء إضافة المستخدم الجديد");
+      }
+
+      setMe({ participant_id: newUser.id, name: newUser.name });
+      showMe();
+      await loadMatches();
     }
   }
 
@@ -480,4 +492,3 @@
 </script>
 </body>
 </html>
-
