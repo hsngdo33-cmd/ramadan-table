@@ -352,6 +352,7 @@
   }
 
  async function loadMatches() {
+    // جلب المباريات من Supabase
     const { data: matches, error } = await supabase
         .from("matches")
         .select("id, day, team_a, team_b, score_a, score_b")
@@ -359,11 +360,12 @@
 
     if (error) return alert("مشكلة في تحميل المباريات");
 
-    // سيتم مسح المباريات الحالية قبل إضافتها من جديد
+    // مسح المباريات الحالية قبل إضافتها من جديد
     matchesRoot.innerHTML = "";
 
+    // إضافة المباريات الجديدة
     matches.forEach((m, idx) => {
-        // تحقق إذا كانت المباراة موجودة بالفعل
+        // تحقق من إذا كانت المباراة موجودة بالفعل
         const card = document.createElement("div");
         card.className = "match";
         card.innerHTML = `
@@ -397,6 +399,7 @@
             ${me ? "" : `<div class="small" style="margin-top:10px">⚠️ احفظ اسمك أولاً عشان تقدر تكتب توقعاتك</div>`}
         `;
 
+        // إضافة المباراة إلى matchesRoot
         matchesRoot.appendChild(card);
     });
 }
