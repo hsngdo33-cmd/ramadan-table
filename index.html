@@ -308,7 +308,6 @@
   </div>
 
 <script type="module">
-  // بيانات المشروع
   const SUPABASE_URL = "https://pigzomxrtrytcvqfqgow.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_VgS6EQA7Eb9ZSmpBPj1Olg_Ndwch13s";
 
@@ -338,17 +337,25 @@
     const name = document.getElementById("name").value.trim();
     if (!name) return alert("اكتب اسمك الأول");
 
+    // التحقق من وجود المستخدم
     const { data, error } = await supabase
       .from("participants")
-      .insert({ name })
       .select("id, name")
+      .eq("name", name)
       .single();
 
-    if (error) return alert("حصل خطأ في حفظ الاسم");
+    if (error) {
+      return alert("حدث خطأ أثناء التحقق من الاسم");
+    }
 
-    setMe({ participant_id: data.id, name: data.name });
-    showMe();
-    await loadMatches();
+    if (data) {
+      // إذا كان الاسم موجودًا، حفظ بيانات المستخدم
+      setMe({ participant_id: data.id, name: data.name });
+      showMe();
+      await loadMatches();
+    } else {
+      alert("لا يوجد مستخدم بهذا الاسم، تأكد من الكتابة الصحيحة");
+    }
   }
 
   async function loadMatches() {
@@ -473,3 +480,4 @@
 </script>
 </body>
 </html>
+
