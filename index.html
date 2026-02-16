@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>فانتزيا دوري السرايا</title>
+  <title>فانتزيا السرايا 2026</title>
   <style>
     :root {
       --bg: #070a1a;
@@ -25,6 +25,23 @@
                   radial-gradient(1200px 600px at 20% 10%, rgba(255, 211, 106, .14), transparent 60%),
                   linear-gradient(180deg, var(--bg), var(--bg2));
       min-height: 100vh;
+      position: relative;
+    }
+
+    .dua-tag {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(255, 211, 106, 0.15);
+      border: 1px solid rgba(255, 211, 106, 0.3);
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      color: var(--y);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
     .wrap {
@@ -256,19 +273,22 @@
       .teams { grid-template-columns: 1fr; }
       .vs { justify-self: center; }
       table { min-width: 450px; font-size: 13px; }
+      .dua-tag { font-size: 9px; padding: 6px 10px; bottom: 5px; left: 5px; }
     }
   </style>
 </head>
 <body>
+  <div class="dua-tag">نسألكم الدعاء لابي الاستاذ محمد حسن عبدالرحمن</div>
+
   <div class="wrap">
     <div class="card">
-      <h1>⚽ فانتزيا دوري السرايا 2026</h1>
-      <p class="muted">سجل اسمك مرة واحدة وابدأ التوقع. سيتم غلق التوقع آلياً عند بدء المباراة.</p>
+      <h1>🏆 فانتزيا السرايا 2026</h1>
+      <p class="muted">أدخل اسمك للدخول واسترجاع توقعاتك. سيتم غلق التوقع آلياً عند بدء المباراة.</p>
       
       <div class="row">
-        <input class="nameInput" id="name" placeholder="اكتب اسمك..." />
-        <button class="btn primary" id="saveName">حفظ الاسم</button>
-        <button class="btn" id="clearMe">تغيير</button>
+        <input class="nameInput" id="name" placeholder="اكتب اسمك للمشاركة أو المتابعة..." />
+        <button class="btn primary" id="saveName">دخول / حفظ</button>
+        <button class="btn" id="clearMe">تغيير المستخدم</button>
       </div>
 
       <div class="row">
@@ -308,7 +328,7 @@
 
     <div id="leaderboard" class="card" style="display:none">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <h1>📊 ترتيب المتوقعين</h1>
+        <h1>📊 ترتيب فانتزيا</h1>
         <button class="btn" id="refreshLb" style="padding: 6px 12px; font-size: 12px;">تحديث</button>
       </div>
       <div class="tableWrap">
@@ -334,19 +354,16 @@
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const ME_KEY = "ramadan_me_v1";
+  const ME_KEY = "ramadan_me_final_v1"; 
 
-  /**
-   * تم تعديل تاريخ بداية رمضان ليكون في عام 2026 لضمان عدم غلق التوقعات
-   * نفترض أن 1 رمضان 1447 يوافق تقريباً 18 فبراير 2026
-   */
-  const RAMADAN_START_DATE = new Date("2026-02-18T00:00:00"); 
+  // تأجيل تاريخ البدء قليلاً للسماح بالتوقع حتى اللحظة الأخيرة
+  const RAMADAN_START_DATE = new Date("2026-02-18T18:00:00"); 
 
   function getMatchDeadline(ramadanDay) {
-    // deadline: يوم المباراة الساعة 5:00 مساءً
     const deadline = new Date(RAMADAN_START_DATE);
     deadline.setDate(deadline.getDate() + (parseInt(ramadanDay) - 1));
-    deadline.setHours(17, 0, 0, 0); 
+    // تم تعديل الموعد ليكون الساعة 9 مساءً يوم المباراة لضمان بقائها مفتوحة لفترة أطول قبل البطولة
+    deadline.setHours(21, 0, 0, 0); 
     return deadline;
   }
 
@@ -361,7 +378,8 @@
 
   function showMe() {
     const me = getMe();
-    meInfo.textContent = me ? `✅ اسمك المسجل: ${me.name}` : "⚠️ يرجى حفظ اسمك للمشاركة في التوقعات";
+    meInfo.textContent = me ? `✅ مسجل باسم: ${me.name}` : "⚠️ يرجى إدخال اسمك للبدء في التوقع";
+    if(me) document.getElementById("name").value = me.name;
   }
 
   async function loadMatches() {
@@ -383,6 +401,7 @@
       const played = m.score_a !== null && m.score_b !== null;
       
       const deadline = getMatchDeadline(m.day);
+      // القفل يحدث فقط إذا مر الوقت الفعلي أو إذا سجل المسؤول نتيجة
       const isLocked = now >= deadline;
 
       const card = document.createElement("div");
@@ -398,7 +417,7 @@
           <div class="team">${m.team_b}</div>
         </div>
         <div class="score">
-          <div class="small" style="color:var(--m)">${played ? `النتيجة النهائية: ${m.score_a} - ${m.score_b}` : "⌛ لم تبدأ المباراة بعد"}</div>
+          <div class="small" style="color:var(--m)">${played ? `النتيجة النهائية: ${m.score_a} - ${m.score_b}` : "⌛ المباراة لم تبدأ"}</div>
         </div>
         <div class="score" style="margin-top:10px; flex-direction:column">
           <div class="box">
@@ -410,13 +429,12 @@
             <button class="btn primary" style="padding: 8px 12px; font-size:12px" data-save="${m.id}" 
               ${(me && !isLocked && !played) ? "" : "disabled"}>حفظ</button>
           </div>
-          ${!played && !isLocked ? `<div id="timer-${m.id}" class="countdown">جاري حساب الوقت...</div>` : ""}
-          ${isLocked && !played ? `<div class="lock-info">🔒 انتهى وقت التوقع لهذه المباراة</div>` : ""}
-          ${played ? `<div class="lock-info" style="color:var(--g)">🏁 تم تسجيل النتيجة</div>` : ""}
+          ${!played && !isLocked ? `<div id="timer-${m.id}" class="countdown"></div>` : ""}
+          ${isLocked && !played ? `<div class="lock-info">🔒 مغلق (بدأت المباراة)</div>` : ""}
+          ${played ? `<div class="lock-info" style="color:var(--g)">🏁 تم تأكيد النتيجة</div>` : ""}
         </div>
       `;
       matchesRoot.appendChild(card);
-      
       if (!isLocked && !played) startTimer(m.id, deadline);
     });
     
@@ -426,75 +444,84 @@
   function startTimer(matchId, deadline) {
     const el = document.getElementById(`timer-${matchId}`);
     if (!el) return;
-    
     const update = () => {
       const now = new Date();
       const diff = deadline - now;
-      if (diff <= 0) {
-        el.textContent = "انتهى الوقت!";
-        el.style.color = "var(--error)";
-        return;
-      }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / 3600000);
+      if (diff <= 0) { el.textContent = "بدأت المباراة!"; return; }
+      const h = Math.floor(diff / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
       const s = Math.floor((diff % 60000) / 1000);
-      
-      let timeStr = "";
-      if (days > 0) timeStr += `${days}ي `;
-      timeStr += `${h}س ${m}د ${s}ث`;
-      el.textContent = `متبقي على الغلق: ${timeStr}`;
+      el.textContent = `متبقي على القفل: ${h}س ${m}د ${s}ث`;
     };
     update();
-    const interval = setInterval(() => {
-        if (!document.getElementById(`timer-${matchId}`)) {
-            clearInterval(interval);
-            return;
-        }
-        update();
-    }, 1000);
+    setInterval(update, 1000);
   }
 
   async function ensureParticipant() {
     const nameInput = document.getElementById("name");
-    const name = nameInput.value.trim();
-    if (!name) return alert("من فضلك اكتب اسمك");
+    const name = nameInput.value.trim(); 
+    if (!name) return alert("يرجى كتابة الاسم");
+
+    const { data: participants, error: searchError } = await supabase
+      .from("participants")
+      .select("id, name");
+
+    const existingUser = participants?.find(p => p.name.trim().toLowerCase() === name.toLowerCase());
     
-    const { data, error } = await supabase.from("participants").select("id, name").eq("name", name).maybeSingle();
-    
-    if (data) {
-      setMe({ participant_id: data.id, name: data.name });
+    if (existingUser) {
+      setMe({ participant_id: existingUser.id, name: existingUser.name });
+      alert(`مرحباً بك مجدداً ${existingUser.name}!`);
     } else {
-      const { data: n, error: e } = await supabase.from("participants").insert({ name }).select("id, name").single();
-      if (e) return alert("حدث خطأ أثناء التسجيل");
-      setMe({ participant_id: n.id, name: n.name });
+      const { data: newUser, error: createError } = await supabase
+        .from("participants")
+        .insert({ name: name })
+        .select("id, name")
+        .single();
+        
+      if (createError) {
+          if (createError.code === "23505") {
+             const { data: retryUser } = await supabase.from("participants").select("id, name").eq("name", name).single();
+             if (retryUser) {
+                 setMe({ participant_id: retryUser.id, name: retryUser.name });
+                 alert(`مرحباً بك مجدداً ${retryUser.name}!`);
+             }
+          } else {
+             return alert("عذراً، حدث خطأ تقني في التسجيل.");
+          }
+      } else {
+          setMe({ participant_id: newUser.id, name: newUser.name });
+          alert(`أهلاً بك يا ${newUser.name}! تم تسجيلك بنجاح.`);
+      }
     }
+    
     showMe();
     loadMatches();
   }
 
   async function savePrediction(matchId) {
     const me = getMe();
-    if (!me) return alert("من فضلك سجل اسمك أولاً بالأعلى");
+    if (!me) return alert("يرجى تسجيل الدخول باسمك أولاً");
     
     const { data: match } = await supabase.from("matches").select("day, score_a").eq("id", matchId).single();
-    if (match.score_a !== null) return alert("تم تسجيل النتيجة الفعلية، لا يمكن التوقع الآن");
-    if (new Date() >= getMatchDeadline(match.day)) return alert("عذراً، انتهى الوقت المسموح للتوقع");
+    if (match.score_a !== null || new Date() >= getMatchDeadline(match.day)) {
+        return alert("الوقت انتهى، لا يمكن التعديل.");
+    }
 
     const pA = document.querySelector(`input[data-match="${matchId}"][data-side="a"]`).value;
     const pB = document.querySelector(`input[data-match="${matchId}"][data-side="b"]`).value;
-    
-    if(pA === "" || pB === "") return alert("يجب إدخال الأهداف للفريقين");
+    if(pA === "" || pB === "") return alert("يرجى إدخال أرقام صحيحة");
 
     const { error } = await supabase.from("predictions").upsert({ 
       participant_id: me.participant_id, 
       match_id: matchId, 
       pred_a: parseInt(pA), 
       pred_b: parseInt(pB) 
+    }, {
+      onConflict: 'participant_id,match_id'
     });
     
-    if (error) alert("خطأ في الحفظ، حاول مرة أخرى");
-    else alert("✅ تم حفظ توقعك بنجاح");
+    if (error) alert("فشل الحفظ، حاول مرة أخرى.");
+    else alert("✅ تم الحفظ بنجاح");
   }
 
   function generateTeamsTable(matches) {
@@ -517,7 +544,7 @@
   async function loadLeaderboard() {
     const { data, error } = await supabase.from("leaderboard").select("*").order("points", { ascending: false });
     if (error) return;
-    lbBody.innerHTML = data.map((r,i)=>`<tr><td>${i+1}</td><td class="nameCell">${r.name}</td><td class="pts">${r.points}</td><td>${r.matches_scored}</td></tr>`).join("");
+    lbBody.innerHTML = (data || []).map((r,i)=>`<tr><td>${i+1}</td><td class="nameCell">${r.name}</td><td class="pts">${r.points}</td><td>${r.matches_scored}</td></tr>`).join("");
   }
 
   document.querySelectorAll(".tab").forEach(t => {
@@ -535,9 +562,9 @@
 
   document.getElementById("saveName").addEventListener("click", ensureParticipant);
   document.getElementById("clearMe").addEventListener("click", () => { 
-    if(confirm("هل تريد مسح البيانات المسجلة على هذا الجهاز؟")) {
-        clearMe(); 
-        location.reload(); 
+    if(confirm("سيتم مسح الجلسة الحالية وتغيير الاسم، هل أنت متأكد؟")) {
+      clearMe(); 
+      location.reload(); 
     }
   });
 
