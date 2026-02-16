@@ -357,7 +357,30 @@
     });
   }
 
-  // Tabs
+  // البيانات المتعلقة باللاعبين
+  async function loadLeaderboard() {
+    const { data, error } = await supabase
+      .from("leaderboard")
+      .select("name, points, matches_scored")
+      .order("points", { ascending: false });
+
+    if (error) return alert("مشكلة في تحميل الترتيب");
+
+    const lbBody = document.getElementById("lbBody");
+    lbBody.innerHTML = "";
+    data.forEach((r, i) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i + 1}</td>
+        <td class="nameCell">${r.name}</td>
+        <td class="pts">${r.points}</td>
+        <td>${r.matches_scored}</td>
+      `;
+      lbBody.appendChild(tr);
+    });
+  }
+
+  // تفعيل التبويبات
   document.querySelectorAll(".tab").forEach(t => {
     t.addEventListener("click", async () => {
       document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
@@ -365,20 +388,29 @@
       const tab = t.dataset.tab;
 
       if (tab === "matches") {
-        lbCard.style.display = "none";
-        matchesRoot.style.display = "grid";
+        document.getElementById("leaderboard").style.display = "none";
+        document.getElementById("matches").style.display = "grid";
       } else {
-        matchesRoot.style.display = "none";
-        lbCard.style.display = "block";
+        document.getElementById("matches").style.display = "none";
+        document.getElementById("leaderboard").style.display = "block";
         await loadLeaderboard();
         await loadTeamLeaderboard();  // تحميل ترتيب الفرق
       }
     });
   });
 
-  // Init
-  showMe();
-  await loadMatches();
+  // حفظ الاسم والبيانات الشخصية
+  document.getElementById("saveName").addEventListener("click", async () => {
+    const name = document.getElementById("name").value.trim();
+    if (!name) return alert("اكتب اسمك أولاً");
+    // تنفيذ باقي الكود لحفظ الاسم
+  });
+
+  // تهيئة الصفحة
+  document.addEventListener("DOMContentLoaded", () => {
+    loadLeaderboard();
+    loadTeamLeaderboard();  // تحميل ترتيب الفرق
+  });
 </script>
 </body>
 </html>
