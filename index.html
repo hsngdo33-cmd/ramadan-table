@@ -210,6 +210,13 @@
       font-weight: 800;
     }
 
+    .countdown {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--g);
+      margin-top: 10px;
+    }
+
     .tableWrap {
       overflow: auto;
       border-radius: 14px;
@@ -308,14 +315,13 @@
   </div>
 
 <script type="module">
-  // بيانات المشروع
   const SUPABASE_URL = "https://pigzomxrtrytcvqfqgow.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_VgS6EQA7Eb9ZSmpBPj1Olg_Ndwch13s";
 
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const ME_KEY = "ramadan_me_v1"; // {participant_id, name}
+  const ME_KEY = "ramadan_me_v1";
 
   const matchesRoot = document.getElementById("matches");
   const lbCard = document.getElementById("leaderboard");
@@ -340,15 +346,27 @@
 
     const { data, error } = await supabase
       .from("participants")
-      .insert({ name })
       .select("id, name")
+      .eq("name", name)
       .single();
 
-    if (error) return alert("حصل خطأ في حفظ الاسم");
+    if (data) {
+      setMe({ participant_id: data.id, name: data.name });
+      showMe();
+      loadMatches();
+    } else {
+      const { data: newData, error: insertError } = await supabase
+        .from("participants")
+        .insert({ name })
+        .select("id, name")
+        .single();
 
-    setMe({ participant_id: data.id, name: data.name });
-    showMe();
-    await loadMatches();
+      if (insertError) return alert("حدث خطأ أثناء إضافة الاسم");
+
+      setMe({ participant_id: newData.id, name: newData.name });
+      showMe();
+      loadMatches();
+    }
   }
 
   async function loadMatches() {
@@ -371,9 +389,17 @@
     }
 
     matchesRoot.innerHTML = "";
+    const today = new Date(); // Get the current date
+    const todayStr = today.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+    today.setDate(today.getDate() + 1); // Set to tomorrow for prediction
+
     matches.forEach((m, idx) => {
       const p = myPred[m.id] || { a: "", b: "" };
-      const played = m.score_a !== null && m.score_b !== null;
+      const matchDate = new Date(m.day); // Get the match date
+
+      // Allow prediction only before match starts
+      const canPredict = matchDate > today && matchDate.getDate() !== today.getDate();
+      const isMatchToday = matchDate.toISOString().split("T")[0] === todayStr; 
 
       const card = document.createElement("div");
       card.className = "match";
@@ -390,25 +416,42 @@
         </div>
 
         <div class="score">
-          <div class="small">${played ? `✅ النتيجة الرسمية: ${m.score_a} - ${m.score_b}` : "⌛ لم تُسجل النتيجة بعد"}</div>
+          <div class="small">${m.score_a !== null && m.score_b !== null ? `✅ النتيجة الرسمية: ${m.score_a} - ${m.score_b}` : "⌛ لم تُسجل النتيجة بعد"}</div>
         </div>
 
         <div class="score" style="margin-top:10px">
           <div class="small">توقعك:</div>
           <div class="box">
             <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.a}"
-              data-match="${m.id}" data-side="a" placeholder="0" ${me ? "" : "disabled"} />
+              data-match="${m.id}" data-side="a" placeholder="0" ${canPredict ? "" : "disabled"} />
             <span class="dash">-</span>
             <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.b}"
-              data-match="${m.id}" data-side="b" placeholder="0" ${me ? "" : "disabled"} />
+              data-match="${m.id}" data-side="b" placeholder="0" ${canPredict ? "" : "disabled"} />
           </div>
-          <button class="btn primary" data-save="${m.id}" ${me ? "" : "disabled"}>حفظ</button>
+          <button class="btn primary" data-save="${m.id}" ${canPredict ? "" : "disabled"}>حفظ</button>
+        </div>
+
+        <div class="countdown">
+          <div class="small">${canPredict ? `التوقعات مفتوحة. الوقت المتبقي: ${getCountdown(matchDate)}` : "التوقعات مغلقة الآن."}</div>
         </div>
 
         ${me ? "" : `<div class="small" style="margin-top:10px">⚠️ احفظ اسمك أولاً عشان تقدر تكتب توقعاتك</div>`}
       `;
       matchesRoot.appendChild(card);
     });
+  }
+
+  function getCountdown(matchDate) {
+    const now = new Date();
+    const timeDiff = matchDate - now;
+
+    if (timeDiff <= 0) return "انتهت المباراة";
+    
+    const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return `${days} يوم ${hours} ساعة ${minutes} دقيقة`;
   }
 
   async function loadLeaderboard() {
@@ -471,5 +514,4 @@
   showMe();
   await loadMatches();
 </script>
-</body>
-</html>
+</body
