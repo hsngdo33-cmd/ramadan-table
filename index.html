@@ -72,14 +72,6 @@
   const lbBody = document.getElementById("lbBody");
   const meInfo = document.getElementById("meInfo");
 
-  // دالة لإدخال المباريات يدويًا
-  const matchesData = [
-    { day: "2026-02-18", team_a: "فريق 1", team_b: "فريق 2", score_a: null, score_b: null },
-    { day: "2026-02-19", team_a: "فريق 3", team_b: "فريق 4", score_a: null, score_b: null },
-    { day: "2026-02-20", team_a: "فريق 5", team_b: "فريق 6", score_a: null, score_b: null },
-    // أضف المزيد من المباريات هنا
-  ];
-
   function getMe() {
     try { return JSON.parse(localStorage.getItem(ME_KEY) || "null"); } catch { return null; }
   }
@@ -105,7 +97,7 @@
     if (data) {
       setMe({ participant_id: data.id, name: data.name });
       showMe();
-      loadMatches();  // عند إضافة البيانات السابقة بنعيد تحميل المباريات.
+      loadMatches();
     } else {
       const { data: newData, error: insertError } = await supabase
         .from("participants")
@@ -117,11 +109,18 @@
 
       setMe({ participant_id: newData.id, name: newData.name });
       showMe();
-      loadMatches();  // عند إضافة مستخدم جديد بنقوم بتحميل المباريات.
+      loadMatches();
     }
   }
 
   async function loadMatches() {
+    const { data: matches, error } = await supabase
+      .from("matches")
+      .select("id, team_a, team_b, day, score_a, score_b")
+      .order("day", { ascending: true });
+
+    if (error) return alert("مشكلة في تحميل المباريات");
+
     const me = getMe();
     let myPred = {};
     if (me) {
@@ -134,14 +133,13 @@
     }
 
     matchesRoot.innerHTML = "";
-    matchesData.forEach((m, idx) => {
+    matches.forEach((m, idx) => {
       const p = myPred[m.id] || { a: "", b: "" };
       const played = m.score_a !== null && m.score_b !== null;
 
       const matchDate = new Date(m.day); // تاريخ المباراة
       const currentDate = new Date(); // التاريخ الحالي
 
-      // تحقق من تاريخ المباراة، إذا كان اليوم الذي يسبق المباراة فقط هو المتاح للتوقع
       const tomorrow = new Date();
       tomorrow.setDate(currentDate.getDate() + 1); // يوم غد
 
