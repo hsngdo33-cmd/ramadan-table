@@ -398,8 +398,7 @@
       const matchDate = new Date(m.day); // Get the match date
 
       // Allow prediction only before match starts
-      const canPredict = matchDate > today && matchDate.getDate() !== today.getDate();
-      const isMatchToday = matchDate.toISOString().split("T")[0] === todayStr; 
+      const canPredict = matchDate >= today;
 
       const card = document.createElement("div");
       card.className = "match";
@@ -514,4 +513,5 @@
   showMe();
   await loadMatches();
 </script>
-</body
+</body>
+</html>
