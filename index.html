@@ -359,48 +359,59 @@
 
     if (error) return alert("مشكلة في تحميل المباريات");
 
-    // مسح المباريات الحالية قبل إضافتها من جديد
+    const me = getMe();
+    let myPred = {};
+    if (me) {
+      const { data: preds } = await supabase
+        .from("predictions")
+        .select("match_id, pred_a, pred_b")
+        .eq("participant_id", me.participant_id);
+
+      (preds || []).forEach(p => myPred[p.match_id] = { a: p.pred_a, b: p.pred_b });
+    }
+
     matchesRoot.innerHTML = "";
-
     matches.forEach((m, idx) => {
-        const card = document.createElement("div");
-        card.className = "match";
-        card.innerHTML = `
-            <div class="top">
-                <div style="font-weight:1100">🌙 ${m.day} رمضان</div>
-                <div class="tag">#${String(idx + 1).padStart(2, "0")}</div>
-            </div>
+      const p = myPred[m.id] || { a: "", b: "" };
+      const played = m.score_a !== null && m.score_b !== null;
 
-            <div class="teams">
-                <div class="team">${m.team_a}</div>
-                <div class="vs">VS</div>
-                <div class="team">${m.team_b}</div>
-            </div>
+      const card = document.createElement("div");
+      card.className = "match";
+      card.innerHTML = `
+        <div class="top">
+          <div style="font-weight:1100">🌙 ${m.day} رمضان</div>
+          <div class="tag">#${String(idx + 1).padStart(2, "0")}</div>
+        </div>
 
-            <div class="score">
-                <div class="small">${m.score_a !== null && m.score_b !== null ? `✅ النتيجة الرسمية: ${m.score_a} - ${m.score_b}` : "⌛ لم تُسجل النتيجة بعد"}</div>
-            </div>
+        <div class="teams">
+          <div class="team">${m.team_a}</div>
+          <div class="vs">VS</div>
+          <div class="team">${m.team_b}</div>
+        </div>
 
-            <div class="score" style="margin-top:10px">
-                <div class="small">توقعك:</div>
-                <div class="box">
-                    <input class="num" type="number" min="0" step="1" inputmode="numeric" value=""
-                        data-match="${m.id}" data-side="a" placeholder="0" />
-                    <span class="dash">-</span>
-                    <input class="num" type="number" min="0" step="1" inputmode="numeric" value=""
-                        data-match="${m.id}" data-side="b" placeholder="0" />
-                </div>
-                <button class="btn primary" data-save="${m.id}">حفظ</button>
-            </div>
+        <div class="score">
+          <div class="small">${played ? `✅ النتيجة الرسمية: ${m.score_a} - ${m.score_b}` : "⌛ لم تُسجل النتيجة بعد"}</div>
+        </div>
 
-            ${me ? "" : `<div class="small" style="margin-top:10px">⚠️ احفظ اسمك أولاً عشان تقدر تكتب توقعاتك</div>`}
-        `;
+        <div class="score" style="margin-top:10px">
+          <div class="small">توقعك:</div>
+          <div class="box">
+            <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.a}"
+              data-match="${m.id}" data-side="a" placeholder="0" ${me ? "" : "disabled"} />
+            <span class="dash">-</span>
+            <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.b}"
+              data-match="${m.id}" data-side="b" placeholder="0" ${me ? "" : "disabled"} />
+          </div>
+          <button class="btn primary" data-save="${m.id}" ${me ? "" : "disabled"}>حفظ</button>
+        </div>
 
-        matchesRoot.appendChild(card);
+        ${me ? "" : `<div class="small" style="margin-top:10px">⚠️ احفظ اسمك أولاً عشان تقدر تكتب توقعاتك</div>`}
+      `;
+      matchesRoot.appendChild(card);
     });
-}
+  }
 
-async function loadLeaderboard() {
+  async function loadLeaderboard() {
     const { data, error } = await supabase
       .from("leaderboard")
       .select("name, points, matches_scored")
@@ -419,9 +430,10 @@ async function loadLeaderboard() {
       `;
       lbBody.appendChild(tr);
     });
-}
+  }
 
-document.querySelectorAll(".tab").forEach(t => {
+  // Tabs
+  document.querySelectorAll(".tab").forEach(t => {
     t.addEventListener("click", async () => {
       document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
       t.classList.add("active");
@@ -436,26 +448,28 @@ document.querySelectorAll(".tab").forEach(t => {
         await loadLeaderboard();
       }
     });
-});
+  });
 
-document.getElementById("saveName").addEventListener("click", ensureParticipant);
-document.getElementById("clearMe").addEventListener("click", () => {
+  // Buttons
+  document.getElementById("saveName").addEventListener("click", ensureParticipant);
+  document.getElementById("clearMe").addEventListener("click", () => {
     clearMe();
     document.getElementById("name").value = "";
     showMe();
     loadMatches();
-});
+  });
 
-document.addEventListener("click", (e) => {
+  document.addEventListener("click", (e) => {
     const btn = e.target.closest("button[data-save]");
     if (!btn) return;
     savePrediction(Number(btn.dataset.save));
-});
+  });
 
-document.getElementById("refreshLb").addEventListener("click", loadLeaderboard);
+  document.getElementById("refreshLb").addEventListener("click", loadLeaderboard);
 
-showMe();
-await loadMatches();
+  // Init
+  showMe();
+  await loadMatches();
 </script>
 </body>
 </html>
