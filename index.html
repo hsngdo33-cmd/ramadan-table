@@ -308,14 +308,13 @@
   </div>
 
 <script type="module">
-  // بيانات المشروع
   const SUPABASE_URL = "https://pigzomxrtrytcvqfqgow.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_VgS6EQA7Eb9ZSmpBPj1Olg_Ndwch13s";
 
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const ME_KEY = "ramadan_me_v1"; // {participant_id, name}
+  const ME_KEY = "ramadan_me_v1";
 
   const matchesRoot = document.getElementById("matches");
   const lbCard = document.getElementById("leaderboard");
@@ -340,15 +339,27 @@
 
     const { data, error } = await supabase
       .from("participants")
-      .insert({ name })
       .select("id, name")
+      .eq("name", name)
       .single();
 
-    if (error) return alert("حصل خطأ في حفظ الاسم");
+    if (data) {
+      setMe({ participant_id: data.id, name: data.name });
+      showMe();
+      loadMatches();
+    } else {
+      const { data: newData, error: insertError } = await supabase
+        .from("participants")
+        .insert({ name })
+        .select("id, name")
+        .single();
 
-    setMe({ participant_id: data.id, name: data.name });
-    showMe();
-    await loadMatches();
+      if (insertError) return alert("حدث خطأ أثناء إضافة الاسم");
+
+      setMe({ participant_id: newData.id, name: newData.name });
+      showMe();
+      loadMatches();
+    }
   }
 
   async function loadMatches() {
@@ -379,9 +390,9 @@
       const p = myPred[m.id] || { a: "", b: "" };
       const matchDate = new Date(m.day); // Get the match date
 
-      // Compare today's date with match date
-      const canPredict = matchDate > today && matchDate.getDate() !== today.getDate();  // Can predict if match is in future
-      const isMatchToday = matchDate.toISOString().split("T")[0] === todayStr;  // If match is today
+      // Allow prediction only before match starts
+      const canPredict = matchDate > today && matchDate.getDate() !== today.getDate();
+      const isMatchToday = matchDate.toISOString().split("T")[0] === todayStr; 
 
       const card = document.createElement("div");
       card.className = "match";
