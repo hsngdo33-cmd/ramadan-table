@@ -373,12 +373,13 @@
   }
 
   async function loadMatches() {
-    const { data: matches, error } = await supabase
-      .from("matches")
-      .select("id, day, team_a, team_b, score_a, score_b")
-      .order("day", { ascending: true });
-
-    if (error) return alert("مشكلة في تحميل المباريات");
+    const matches = [
+      { id: 1, day: "2026-02-18", team_a: "فريق 1", team_b: "فريق 2", score_a: null, score_b: null },
+      { id: 2, day: "2026-02-19", team_a: "فريق 3", team_b: "فريق 4", score_a: null, score_b: null },
+      { id: 3, day: "2026-02-20", team_a: "فريق 5", team_b: "فريق 6", score_a: null, score_b: null },
+      { id: 4, day: "2026-02-21", team_a: "فريق 7", team_b: "فريق 8", score_a: null, score_b: null },
+      // أكمل المباريات بنفس الطريقة لمدة 21 يومًا
+    ];
 
     const me = getMe();
     let myPred = {};
