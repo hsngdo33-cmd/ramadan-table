@@ -308,6 +308,7 @@
   </div>
 
 <script type="module">
+  // بيانات المشروع
   const SUPABASE_URL = "https://pigzomxrtrytcvqfqgow.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_VgS6EQA7Eb9ZSmpBPj1Olg_Ndwch13s";
 
@@ -337,36 +338,30 @@
     const name = document.getElementById("name").value.trim();
     if (!name) return alert("اكتب اسمك الأول");
 
-    // التحقق من وجود المستخدم
     const { data, error } = await supabase
       .from("participants")
       .select("id, name")
       .eq("name", name)
       .single();
 
-    if (error) {
-      return alert("حدث خطأ أثناء التحقق من الاسم");
-    }
-
     if (data) {
+      // إذا كان الاسم موجودًا بالفعل
       setMe({ participant_id: data.id, name: data.name });
       showMe();
-      await loadMatches();
+      loadMatches();
     } else {
-      // إضافة المستخدم إلى قاعدة البيانات إذا لم يكن موجودًا
-      const { data: newUser, error: insertError } = await supabase
+      // إذا كان الاسم غير موجود
+      const { data: newData, error: insertError } = await supabase
         .from("participants")
         .insert({ name })
         .select("id, name")
         .single();
 
-      if (insertError) {
-        return alert("حدث خطأ أثناء إضافة المستخدم الجديد");
-      }
+      if (insertError) return alert("حدث خطأ أثناء إضافة الاسم");
 
-      setMe({ participant_id: newUser.id, name: newUser.name });
+      setMe({ participant_id: newData.id, name: newData.name });
       showMe();
-      await loadMatches();
+      loadMatches();
     }
   }
 
