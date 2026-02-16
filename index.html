@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>توقعات بطولة رمضان</title>
   <style>
-    /* احتفظ بنفس التنسيق */
+    /* نفس التنسيق السابق */
   </style>
 </head>
 <body>
@@ -173,6 +173,23 @@
       `;
       matchesRoot.appendChild(card);
     });
+  }
+
+  // حفظ التوقعات في قاعدة البيانات
+  async function savePrediction(matchId) {
+    const me = getMe();
+    if (!me) return alert("الرجاء حفظ اسمك أولاً");
+
+    const predA = document.querySelector(`input[data-match="${matchId}"][data-side="a"]`).value;
+    const predB = document.querySelector(`input[data-match="${matchId}"][data-side="b"]`).value;
+
+    const { error } = await supabase
+      .from("predictions")
+      .upsert({ participant_id: me.participant_id, match_id: matchId, pred_a: predA, pred_b: predB });
+
+    if (error) return alert("حدث خطأ أثناء حفظ التوقعات");
+
+    alert("تم حفظ التوقعات");
   }
 
   async function loadLeaderboard() {
