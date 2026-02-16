@@ -353,18 +353,15 @@
 
   async function loadMatches() {
     const { data: matches, error } = await supabase
-        .from("matches")
-        .select("id, day, team_a, team_b, score_a, score_b")
-        .order("day", { ascending: true });
+      .from("matches")
+      .select("id, day, team_a, team_b, score_a, score_b")
+      .order("day", { ascending: true });
 
     if (error) return alert("مشكلة في تحميل المباريات");
 
     // مسح المباريات الحالية قبل إضافتها من جديد
     matchesRoot.innerHTML = "";
 
-    const me = getMe();  // تعريف المتغير me هنا
-
-    // إضافة المباريات الجديدة
     matches.forEach((m, idx) => {
         const card = document.createElement("div");
         card.className = "match";
@@ -401,23 +398,6 @@
 
         matchesRoot.appendChild(card);
     });
-}
-
-async function ensureParticipant() {
-    const name = document.getElementById("name").value.trim();
-    if (!name) return alert("اكتب اسمك الأول");
-
-    const { data, error } = await supabase
-      .from("participants")
-      .insert({ name })
-      .select("id, name")
-      .single();
-
-    if (error) return alert("حصل خطأ في حفظ الاسم");
-
-    setMe({ participant_id: data.id, name: data.name });
-    showMe();
-    await loadMatches();
 }
 
 async function loadLeaderboard() {
