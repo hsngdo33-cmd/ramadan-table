@@ -123,18 +123,25 @@
 
   async function ensureParticipant(){
     const name = document.getElementById("name").value.trim();
-    if(!name) return alert("اكتب اسمك الأول");
+    console.log("Entered Name: ", name);  // طباعة الاسم الذي أدخلته
+    if (!name) return alert("اكتب اسمك الأول");
 
+    // محاولة حفظ الاسم
     const { data, error } = await supabase
-      .from("participants")
-      .insert({ name })
-      .select("id,name")
-      .single();
+        .from("participants")
+        .insert({ name })
+        .select("id, name")
+        .single();
 
-    if(error) return alert("حصل خطأ في حفظ الاسم");
+    if (error) {
+        console.log("Error in saving name: ", error);  // طباعة الخطأ لو فيه مشكلة
+        return alert("حصل خطأ في حفظ الاسم");
+    }
+
     setMe({ participant_id: data.id, name: data.name });
+    console.log("Saved Participant: ", data);  // طباعة البيانات اللي اتحفظت
     showMe();
-    await loadMatches();
+    await loadMatches();  // تحميل المباريات بعد حفظ الاسم
   }
 
   async function loadMatches(){
