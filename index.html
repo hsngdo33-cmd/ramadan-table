@@ -505,3 +505,26 @@
     });
   });
 
+  // Buttons
+  document.getElementById("saveName").addEventListener("click", ensureParticipant);
+  document.getElementById("clearMe").addEventListener("click", () => {
+    clearMe();
+    document.getElementById("name").value = "";
+    showMe();
+    loadMatches();
+  });
+
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-save]");
+    if (!btn) return;
+    savePrediction(Number(btn.dataset.save));
+  });
+
+  document.getElementById("refreshLb").addEventListener("click", loadLeaderboard);
+
+  // Init
+  showMe();
+  await loadMatches();
+</script>
+</body>
+</html>
