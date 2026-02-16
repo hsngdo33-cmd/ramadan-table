@@ -2,8 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>فانتزيا دوري السرايا</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>توقعات بطولة رمضان</title>
   <style>
     :root {
       --bg: #070a1a;
@@ -14,6 +14,7 @@
       --g: #47f0b3;
       --y: #ffd36a;
       --accent: #7c5cff;
+      --error: #ff6b6b;
     }
 
     body {
@@ -82,7 +83,8 @@
       transition: 0.2s;
     }
 
-    .btn:hover { background: rgba(255, 255, 255, .1); }
+    .btn:hover:not(:disabled) { background: rgba(255, 255, 255, .1); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .btn.primary {
       border-color: rgba(255, 211, 106, .32);
@@ -123,6 +125,7 @@
       border-radius: 18px;
       padding: 14px;
       background: rgba(0, 0, 0, .16);
+      position: relative;
     }
 
     .top {
@@ -197,6 +200,31 @@
       font-weight: 1100;
       text-align: center;
     }
+    
+    .num:disabled { opacity: 0.5; }
+
+    .countdown {
+      font-size: 11px;
+      color: var(--y);
+      text-align: center;
+      margin-top: 8px;
+      font-weight: bold;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 211, 106, 0.1);
+    }
+
+    .lock-info {
+      font-size: 10px;
+      color: var(--error);
+      margin-top: 8px;
+      font-weight: bold;
+      text-align: center;
+      background: rgba(255, 107, 107, 0.1);
+      padding: 4px;
+      border-radius: 4px;
+    }
 
     .tableWrap {
       overflow-x: auto;
@@ -223,7 +251,6 @@
     
     .nameCell { text-align: right !important; }
     .pts { color: var(--g); font-weight: 1200; }
-    .highlight { color: var(--y); }
 
     @media(max-width: 560px) {
       .teams { grid-template-columns: 1fr; }
@@ -235,8 +262,8 @@
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>⚽ فانتزيا دوري السرايا</h1>
-      <p class="muted">اكتب اسمك مرة واحدة… وبعدها توقع النتائج. الترتيب بيتحسب تلقائيًا.</p>
+      <h1>⚽ توقعات بطولة رمضان 2026</h1>
+      <p class="muted">سجل اسمك مرة واحدة وابدأ التوقع. سيتم غلق التوقع آلياً عند بدء المباراة.</p>
       
       <div class="row">
         <input class="nameInput" id="name" placeholder="اكتب اسمك..." />
@@ -252,16 +279,13 @@
     <div class="tabs">
       <div class="tab active" data-tab="matches">المباريات</div>
       <div class="tab" data-tab="teams-standings">ترتيب الفرق</div>
-      <div class="tab" data-tab="leaderboard">ترتيب فانتزيا</div>
+      <div class="tab" data-tab="leaderboard">ترتيب المتوقعين</div>
     </div>
 
-    <!-- قسم المباريات -->
     <div id="matches" class="grid"></div>
 
-    <!-- قسم ترتيب الفرق (الدوري) -->
     <div id="teams-standings" class="card" style="display:none">
       <h1 style="margin-bottom:4px">🏆 جدول ترتيب البطولة</h1>
-      <p class="muted">يتم التحديث بناءً على النتائج الرسمية للمباريات.</p>
       <div class="tableWrap">
         <table>
           <thead>
@@ -282,13 +306,11 @@
       </div>
     </div>
 
-    <!-- قسم ترتيب المتوقعين -->
     <div id="leaderboard" class="card" style="display:none">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <h1>📊 ترتيب المتوقعين</h1>
         <button class="btn" id="refreshLb" style="padding: 6px 12px; font-size: 12px;">تحديث</button>
       </div>
-      <p class="muted">3 للنتيجة • 1 للاتجاه • 0 غلط</p>
       <div class="tableWrap">
         <table>
           <thead>
@@ -314,10 +336,21 @@
 
   const ME_KEY = "ramadan_me_v1";
 
-  // العناصر
+  /**
+   * تم تعديل تاريخ بداية رمضان ليكون في عام 2026 لضمان عدم غلق التوقعات
+   * نفترض أن 1 رمضان 1447 يوافق تقريباً 18 فبراير 2026
+   */
+  const RAMADAN_START_DATE = new Date("2026-02-18T00:00:00"); 
+
+  function getMatchDeadline(ramadanDay) {
+    // deadline: يوم المباراة الساعة 5:00 مساءً
+    const deadline = new Date(RAMADAN_START_DATE);
+    deadline.setDate(deadline.getDate() + (parseInt(ramadanDay) - 1));
+    deadline.setHours(17, 0, 0, 0); 
+    return deadline;
+  }
+
   const matchesRoot = document.getElementById("matches");
-  const teamsStandingsCard = document.getElementById("teams-standings");
-  const leaderboardCard = document.getElementById("leaderboard");
   const lbBody = document.getElementById("lbBody");
   const teamsBody = document.getElementById("teamsBody");
   const meInfo = document.getElementById("meInfo");
@@ -331,23 +364,6 @@
     meInfo.textContent = me ? `✅ اسمك المسجل: ${me.name}` : "⚠️ يرجى حفظ اسمك للمشاركة في التوقعات";
   }
 
-  async function ensureParticipant() {
-    const name = document.getElementById("name").value.trim();
-    if (!name) return alert("اكتب اسمك الأول");
-
-    const { data, error } = await supabase.from("participants").select("id, name").eq("name", name).single();
-
-    if (data) {
-      setMe({ participant_id: data.id, name: data.name });
-    } else {
-      const { data: newData, error: insertError } = await supabase.from("participants").insert({ name }).select("id, name").single();
-      if (insertError) return alert("حدث خطأ أثناء إضافة الاسم");
-      setMe({ participant_id: newData.id, name: newData.name });
-    }
-    showMe();
-    loadMatches();
-  }
-
   async function loadMatches() {
     const { data: matches, error } = await supabase.from("matches").select("*").order("day", { ascending: true });
     if (error) return;
@@ -359,10 +375,15 @@
       (preds || []).forEach(p => myPred[p.match_id] = { a: p.pred_a, b: p.pred_b });
     }
 
+    const now = new Date();
+
     matchesRoot.innerHTML = "";
     matches.forEach((m, idx) => {
       const p = myPred[m.id] || { a: "", b: "" };
       const played = m.score_a !== null && m.score_b !== null;
+      
+      const deadline = getMatchDeadline(m.day);
+      const isLocked = now >= deadline;
 
       const card = document.createElement("div");
       card.className = "match";
@@ -377,82 +398,93 @@
           <div class="team">${m.team_b}</div>
         </div>
         <div class="score">
-          <div class="small" style="color:var(--m)">${played ? `النتيجة: ${m.score_a} - ${m.score_b}` : "⌛ في انتظار المباراة"}</div>
+          <div class="small" style="color:var(--m)">${played ? `النتيجة النهائية: ${m.score_a} - ${m.score_b}` : "⌛ لم تبدأ المباراة بعد"}</div>
         </div>
         <div class="score" style="margin-top:10px; flex-direction:column">
           <div class="box">
-            <input class="num" type="number" value="${p.a}" data-match="${m.id}" data-side="a" ${me ? "" : "disabled"} />
+            <input class="num" type="number" placeholder="0" value="${p.a}" data-match="${m.id}" data-side="a" 
+              ${(me && !isLocked && !played) ? "" : "disabled"} />
             <span style="color:var(--y)">-</span>
-            <input class="num" type="number" value="${p.b}" data-match="${m.id}" data-side="b" ${me ? "" : "disabled"} />
-            <button class="btn primary" style="padding: 8px 12px; font-size:12px" data-save="${m.id}" ${me ? "" : "disabled"}>حفظ</button>
+            <input class="num" type="number" placeholder="0" value="${p.b}" data-match="${m.id}" data-side="b" 
+              ${(me && !isLocked && !played) ? "" : "disabled"} />
+            <button class="btn primary" style="padding: 8px 12px; font-size:12px" data-save="${m.id}" 
+              ${(me && !isLocked && !played) ? "" : "disabled"}>حفظ</button>
           </div>
+          ${!played && !isLocked ? `<div id="timer-${m.id}" class="countdown">جاري حساب الوقت...</div>` : ""}
+          ${isLocked && !played ? `<div class="lock-info">🔒 انتهى وقت التوقع لهذه المباراة</div>` : ""}
+          ${played ? `<div class="lock-info" style="color:var(--g)">🏁 تم تسجيل النتيجة</div>` : ""}
         </div>
       `;
       matchesRoot.appendChild(card);
+      
+      if (!isLocked && !played) startTimer(m.id, deadline);
     });
     
-    // حساب جدول ترتيب الفرق تلقائياً من النتائج الرسمية
     generateTeamsTable(matches);
   }
 
-  function generateTeamsTable(matches) {
-    const stats = {};
-
-    matches.forEach(m => {
-      if (m.score_a === null || m.score_b === null) return;
-      
-      [m.team_a, m.team_b].forEach(t => {
-        if (!stats[t]) stats[t] = { name: t, pld: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 };
-      });
-
-      const sA = parseInt(m.score_a);
-      const sB = parseInt(m.score_b);
-
-      stats[m.team_a].pld++;
-      stats[m.team_b].pld++;
-      stats[m.team_a].gf += sA;
-      stats[m.team_a].ga += sB;
-      stats[m.team_b].gf += sB;
-      stats[m.team_b].ga += sA;
-
-      if (sA > sB) {
-        stats[m.team_a].w++; stats[m.team_a].pts += 3;
-        stats[m.team_b].l++;
-      } else if (sA < sB) {
-        stats[m.team_b].w++; stats[m.team_b].pts += 3;
-        stats[m.team_a].l++;
-      } else {
-        stats[m.team_a].d++; stats[m.team_a].pts += 1;
-        stats[m.team_b].d++; stats[m.team_b].pts += 1;
+  function startTimer(matchId, deadline) {
+    const el = document.getElementById(`timer-${matchId}`);
+    if (!el) return;
+    
+    const update = () => {
+      const now = new Date();
+      const diff = deadline - now;
+      if (diff <= 0) {
+        el.textContent = "انتهى الوقت!";
+        el.style.color = "var(--error)";
+        return;
       }
-    });
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      
+      let timeStr = "";
+      if (days > 0) timeStr += `${days}ي `;
+      timeStr += `${h}س ${m}د ${s}ث`;
+      el.textContent = `متبقي على الغلق: ${timeStr}`;
+    };
+    update();
+    const interval = setInterval(() => {
+        if (!document.getElementById(`timer-${matchId}`)) {
+            clearInterval(interval);
+            return;
+        }
+        update();
+    }, 1000);
+  }
 
-    const sorted = Object.values(stats).sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga));
-
-    teamsBody.innerHTML = sorted.length ? "" : "<tr><td colspan='9'>لا توجد نتائج مسجلة بعد</td></tr>";
-    sorted.forEach((t, i) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${i + 1}</td>
-        <td class="nameCell">${t.name}</td>
-        <td>${t.pld}</td>
-        <td>${t.w}</td>
-        <td>${t.d}</td>
-        <td>${t.l}</td>
-        <td>${t.gf}</td>
-        <td>${t.ga}</td>
-        <td class="pts">${t.pts}</td>
-      `;
-      teamsBody.appendChild(tr);
-    });
+  async function ensureParticipant() {
+    const nameInput = document.getElementById("name");
+    const name = nameInput.value.trim();
+    if (!name) return alert("من فضلك اكتب اسمك");
+    
+    const { data, error } = await supabase.from("participants").select("id, name").eq("name", name).maybeSingle();
+    
+    if (data) {
+      setMe({ participant_id: data.id, name: data.name });
+    } else {
+      const { data: n, error: e } = await supabase.from("participants").insert({ name }).select("id, name").single();
+      if (e) return alert("حدث خطأ أثناء التسجيل");
+      setMe({ participant_id: n.id, name: n.name });
+    }
+    showMe();
+    loadMatches();
   }
 
   async function savePrediction(matchId) {
     const me = getMe();
-    if (!me) return;
+    if (!me) return alert("من فضلك سجل اسمك أولاً بالأعلى");
+    
+    const { data: match } = await supabase.from("matches").select("day, score_a").eq("id", matchId).single();
+    if (match.score_a !== null) return alert("تم تسجيل النتيجة الفعلية، لا يمكن التوقع الآن");
+    if (new Date() >= getMatchDeadline(match.day)) return alert("عذراً، انتهى الوقت المسموح للتوقع");
+
     const pA = document.querySelector(`input[data-match="${matchId}"][data-side="a"]`).value;
     const pB = document.querySelector(`input[data-match="${matchId}"][data-side="b"]`).value;
-    if(pA === "" || pB === "") return alert("ضع توقعاً كاملاً");
+    
+    if(pA === "" || pB === "") return alert("يجب إدخال الأهداف للفريقين");
 
     const { error } = await supabase.from("predictions").upsert({ 
       participant_id: me.participant_id, 
@@ -460,44 +492,53 @@
       pred_a: parseInt(pA), 
       pred_b: parseInt(pB) 
     });
-    if (error) alert("خطأ في الحفظ");
-    else alert("تم حفظ توقعك بنجاح ✅");
+    
+    if (error) alert("خطأ في الحفظ، حاول مرة أخرى");
+    else alert("✅ تم حفظ توقعك بنجاح");
+  }
+
+  function generateTeamsTable(matches) {
+    const stats = {};
+    matches.forEach(m => {
+      if (m.score_a === null) return;
+      [m.team_a, m.team_b].forEach(t => { if(!stats[t]) stats[t]={name:t,pld:0,w:0,d:0,l:0,gf:0,ga:0,pts:0}; });
+      const sA=parseInt(m.score_a), sB=parseInt(m.score_b);
+      stats[m.team_a].pld++; stats[m.team_b].pld++;
+      stats[m.team_a].gf+=sA; stats[m.team_a].ga+=sB;
+      stats[m.team_b].gf+=sB; stats[m.team_b].ga+=sA;
+      if(sA>sB){ stats[m.team_a].w++; stats[m.team_a].pts+=3; stats[m.team_b].l++; }
+      else if(sA<sB){ stats[m.team_b].w++; stats[m.team_b].pts+=3; stats[m.team_a].l++; }
+      else { stats[m.team_a].d++; stats[m.team_a].pts+=1; stats[m.team_b].d++; stats[m.team_b].pts+=1; }
+    });
+    const sorted = Object.values(stats).sort((a,b)=>b.pts-a.pts || (b.gf-b.ga)-(a.gf-a.ga));
+    teamsBody.innerHTML = sorted.map((t,i)=>`<tr><td>${i+1}</td><td class="nameCell">${t.name}</td><td>${t.pld}</td><td>${t.w}</td><td>${t.d}</td><td>${t.l}</td><td>${t.gf}</td><td>${t.ga}</td><td class="pts">${t.pts}</td></tr>`).join("");
   }
 
   async function loadLeaderboard() {
     const { data, error } = await supabase.from("leaderboard").select("*").order("points", { ascending: false });
     if (error) return;
-    lbBody.innerHTML = "";
-    data.forEach((r, i) => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td>${i + 1}</td><td class="nameCell">${r.name}</td><td class="pts">${r.points}</td><td>${r.matches_scored}</td>`;
-      lbBody.appendChild(tr);
-    });
+    lbBody.innerHTML = data.map((r,i)=>`<tr><td>${i+1}</td><td class="nameCell">${r.name}</td><td class="pts">${r.points}</td><td>${r.matches_scored}</td></tr>`).join("");
   }
 
-  // التحكم في التبويبات
   document.querySelectorAll(".tab").forEach(t => {
     t.addEventListener("click", async () => {
       document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
       t.classList.add("active");
-      
       const tab = t.dataset.tab;
-      matchesRoot.style.display = (tab === "matches") ? "grid" : "none";
-      teamsStandingsCard.style.display = (tab === "teams-standings") ? "block" : "none";
-      leaderboardCard.style.display = (tab === "leaderboard") ? "block" : "none";
-
+      document.getElementById("matches").style.display = (tab === "matches") ? "grid" : "none";
+      document.getElementById("teams-standings").style.display = (tab === "teams-standings") ? "block" : "none";
+      document.getElementById("leaderboard").style.display = (tab === "leaderboard") ? "block" : "none";
       if (tab === "leaderboard") await loadLeaderboard();
-      if (tab === "teams-standings") await loadMatches();
+      if (tab === "matches") await loadMatches();
     });
   });
 
   document.getElementById("saveName").addEventListener("click", ensureParticipant);
-  document.getElementById("clearMe").addEventListener("click", () => {
-    if(!confirm("هل تريد تغيير الاسم؟")) return;
-    clearMe();
-    document.getElementById("name").value = "";
-    showMe();
-    loadMatches();
+  document.getElementById("clearMe").addEventListener("click", () => { 
+    if(confirm("هل تريد مسح البيانات المسجلة على هذا الجهاز؟")) {
+        clearMe(); 
+        location.reload(); 
+    }
   });
 
   document.addEventListener("click", (e) => {
@@ -505,9 +546,6 @@
     if (btn) savePrediction(Number(btn.dataset.save));
   });
 
-  document.getElementById("refreshLb").addEventListener("click", loadLeaderboard);
-
-  // تشغيل أولي
   showMe();
   loadMatches();
 </script>
