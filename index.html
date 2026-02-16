@@ -384,10 +384,16 @@
       (preds || []).forEach(p => myPred[p.match_id] = { a: p.pred_a, b: p.pred_b });
     }
 
+    // احصل على تاريخ اليوم
+    const today = new Date().toISOString().split('T')[0]; // الشكل YYYY-MM-DD
+
     matchesRoot.innerHTML = "";
     matches.forEach((m, idx) => {
       const p = myPred[m.id] || { a: "", b: "" };
       const played = m.score_a !== null && m.score_b !== null;
+
+      // تحقق إذا كانت المباراة هي مباراة اليوم
+      const isToday = m.day === today;
 
       const card = document.createElement("div");
       card.className = "match";
@@ -411,12 +417,12 @@
           <div class="small">توقعك:</div>
           <div class="box">
             <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.a}"
-              data-match="${m.id}" data-side="a" placeholder="" ${me ? "" : "disabled"} />
+              data-match="${m.id}" data-side="a" placeholder="" ${isToday || me ? "" : "disabled"} />
             <span class="dash">-</span>
             <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.b}"
-              data-match="${m.id}" data-side="b" placeholder="" ${me ? "" : "disabled"} />
+              data-match="${m.id}" data-side="b" placeholder="" ${isToday || me ? "" : "disabled"} />
           </div>
-          <button class="btn primary" data-save="${m.id}" ${me ? "" : "disabled"}>حفظ</button>
+          <button class="btn primary" data-save="${m.id}" ${isToday || me ? "" : "disabled"}>حفظ</button>
         </div>
 
         ${me ? "" : `<div class="small" style="margin-top:10px">⚠️ احفظ اسمك أولاً عشان تقدر تكتب توقعاتك</div>`}
