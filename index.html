@@ -210,6 +210,13 @@
       font-weight: 800;
     }
 
+    .countdown {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--g);
+      margin-top: 10px;
+    }
+
     .tableWrap {
       overflow: auto;
       border-radius: 14px;
@@ -308,7 +315,6 @@
   </div>
 
 <script type="module">
-  // بيانات المشروع
   const SUPABASE_URL = "https://pigzomxrtrytcvqfqgow.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_VgS6EQA7Eb9ZSmpBPj1Olg_Ndwch13s";
 
@@ -345,12 +351,10 @@
       .single();
 
     if (data) {
-      // إذا كان الاسم موجودًا بالفعل
       setMe({ participant_id: data.id, name: data.name });
       showMe();
-      loadMatches();  // عند إضافة البيانات السابقة بنعيد تحميل المباريات.
+      loadMatches();
     } else {
-      // إذا كان الاسم غير موجود
       const { data: newData, error: insertError } = await supabase
         .from("participants")
         .insert({ name })
@@ -361,7 +365,7 @@
 
       setMe({ participant_id: newData.id, name: newData.name });
       showMe();
-      loadMatches();  // عند إضافة مستخدم جديد بنقوم بتحميل المباريات.
+      loadMatches();
     }
   }
 
@@ -385,9 +389,16 @@
     }
 
     matchesRoot.innerHTML = "";
+    const today = new Date(); // Get the current date
+    const todayStr = today.toISOString().split("T")[0]; // Format as YYYY-MM-DD
+    today.setDate(today.getDate() + 1); // Set to tomorrow for prediction
+
     matches.forEach((m, idx) => {
       const p = myPred[m.id] || { a: "", b: "" };
-      const played = m.score_a !== null && m.score_b !== null;
+      const matchDate = new Date(m.day); // Get the match date
+
+      // Allow prediction only before match starts
+      const canPredict = matchDate >= today;
 
       const card = document.createElement("div");
       card.className = "match";
@@ -404,42 +415,25 @@
         </div>
 
         <div class="score">
-          <div class="small">${played ? `✅ النتيجة الرسمية: ${m.score_a} - ${m.score_b}` : "⌛ لم تُسجل النتيجة بعد"}</div>
+          <div class="small">${m.score_a !== null && m.score_b !== null ? `✅ النتيجة الرسمية: ${m.score_a} - ${m.score_b}` : "⌛ لم تُسجل النتيجة بعد"}</div>
         </div>
 
         <div class="score" style="margin-top:10px">
           <div class="small">توقعك:</div>
           <div class="box">
             <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.a}"
-              data-match="${m.id}" data-side="a" placeholder="" ${me ? "" : "disabled"} />
+              data-match="${m.id}" data-side="a" placeholder="0" ${canPredict ? "" : "disabled"} />
             <span class="dash">-</span>
             <input class="num" type="number" min="0" step="1" inputmode="numeric" value="${p.b}"
-              data-match="${m.id}" data-side="b" placeholder="" ${me ? "" : "disabled"} />
+              data-match="${m.id}" data-side="b" placeholder="0" ${canPredict ? "" : "disabled"} />
           </div>
-          <button class="btn primary" data-save="${m.id}" ${me ? "" : "disabled"}>حفظ</button>
+          <button class="btn primary" data-save="${m.id}" ${canPredict ? "" : "disabled"}>حفظ</button>
         </div>
 
         ${me ? "" : `<div class="small" style="margin-top:10px">⚠️ احفظ اسمك أولاً عشان تقدر تكتب توقعاتك</div>`}
       `;
       matchesRoot.appendChild(card);
     });
-  }
-
-  // حفظ التوقعات في قاعدة البيانات
-  async function savePrediction(matchId) {
-    const me = getMe();
-    if (!me) return alert("الرجاء حفظ اسمك أولاً");
-
-    const predA = document.querySelector(`input[data-match="${matchId}"][data-side="a"]`).value;
-    const predB = document.querySelector(`input[data-match="${matchId}"][data-side="b"]`).value;
-
-    const { error } = await supabase
-      .from("predictions")
-      .upsert({ participant_id: me.participant_id, match_id: matchId, pred_a: predA, pred_b: predB });
-
-    if (error) return alert("حدث خطأ أثناء حفظ التوقعات");
-
-    alert("تم حفظ التوقعات");
   }
 
   async function loadLeaderboard() {
