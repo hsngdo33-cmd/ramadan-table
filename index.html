@@ -68,6 +68,17 @@
       margin: 6px 0 0;
     }
 
+    .rules-box {
+      background: rgba(124, 92, 255, 0.1);
+      border: 1px solid rgba(124, 92, 255, 0.2);
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      color: #d9d4ff;
+      margin-bottom: 12px;
+      line-height: 1.5;
+    }
+
     .row {
       display: flex;
       gap: 10px;
@@ -278,7 +289,6 @@
     .nameCell { text-align: right !important; }
     .pts { color: var(--g); font-weight: 1200; }
 
-    /* موبايل: الحفاظ على التخطيط الأفقي */
     @media(max-width: 600px) {
       .wrap { padding: 10px; }
       .team { font-size: 11px; padding: 8px 2px; }
@@ -297,7 +307,7 @@
   <div class="wrap">
     <div class="card">
       <h1>🏆 فانتزيا السرايا 2026</h1>
-      <p class="muted">أدخل اسمك للمشاركة. القفل يتم آلياً عند موعد المباراة.</p>
+      <p class="muted">شارك بتوقعاتك واربح النقاط في دوري رمضان المبارك.</p>
       
       <div class="row">
         <input class="nameInput" id="name" placeholder="الاسم هنا..." />
@@ -319,7 +329,7 @@
     <div id="matches" class="grid"></div>
 
     <div id="teams-standings" class="card" style="display:none">
-      <h1 style="margin-bottom:8px">🏆 ترتيب الفرق</h1>
+      <h1 style="margin-bottom:12px">🏆 ترتيب الفرق</h1>
       <div class="tableWrap">
         <table>
           <thead>
@@ -337,18 +347,25 @@
     </div>
 
     <div id="leaderboard" class="card" style="display:none">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-        <h1>📊 الترتيب العام</h1>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px; gap: 10px;">
+        <div>
+          <h1>📊 ترتيب فانتزيا</h1>
+        </div>
         <button class="btn" id="refreshLb" style="padding: 6px 10px; font-size: 11px;">تحديث</button>
       </div>
+
+      <div class="rules-box">
+        <strong>قواعد النقاط:</strong> توقع النتيجة والأهداف بدقة (5ن) • توقع الفائز/التعادل صح والأهداف خطأ (3ن) • غير ذلك (0ن).
+      </div>
+
       <div class="tableWrap">
         <table>
           <thead>
             <tr>
               <th>#</th>
-              <th class="nameCell">الاسم</th>
+              <th class="nameCell">المتوقع</th>
               <th>النقاط</th>
-              <th>صحيح</th>
+              <th>توقع صحيح</th>
             </tr>
           </thead>
           <tbody id="lbBody"></tbody>
@@ -459,7 +476,7 @@
       el.textContent = `قفل بعد: ${h}س ${m}د`;
     };
     update();
-    setInterval(update, 60000); // تحديث كل دقيقة يكفي
+    setInterval(update, 60000);
   }
 
   async function ensureParticipant() {
@@ -523,8 +540,42 @@
   }
 
   async function loadLeaderboard() {
-    const { data } = await supabase.from("leaderboard").select("*").order("points", { ascending: false });
-    lbBody.innerHTML = (data || []).map((r,i)=>`<tr><td>${i+1}</td><td class="nameCell">${r.name}</td><td class="pts">${r.points}</td><td>${r.matches_scored}</td></tr>`).join("");
+    const { data: participants } = await supabase.from("participants").select("id, name");
+    const { data: predictions } = await supabase.from("predictions").select("*");
+    const { data: matches } = await supabase.from("matches").select("*").not("score_a", "is", null);
+
+    const matchMap = {};
+    matches.forEach(m => matchMap[m.id] = m);
+
+    const leaderData = participants.map(p => {
+      let totalPoints = 0;
+      let exactMatches = 0;
+      
+      const myPreds = predictions.filter(pr => pr.participant_id === p.id);
+      myPreds.forEach(pr => {
+        const m = matchMap[pr.match_id];
+        if (!m) return;
+
+        const sA = m.score_a;
+        const sB = m.score_b;
+        const pA = pr.pred_a;
+        const pB = pr.pred_b;
+
+        if (sA === pA && sB === pB) {
+          totalPoints += 5;
+          exactMatches++;
+        } 
+        else {
+          const matchResult = sA > sB ? 1 : (sA < sB ? -1 : 0);
+          const predResult = pA > pB ? 1 : (pA < pB ? -1 : 0);
+          if (matchResult === predResult) totalPoints += 3;
+        }
+      });
+      return { name: p.name, points: totalPoints, matches_scored: exactMatches };
+    });
+
+    const sorted = leaderData.sort((a,b) => b.points - a.points || b.matches_scored - a.matches_scored);
+    lbBody.innerHTML = sorted.map((r,i)=>`<tr><td>${i+1}</td><td class="nameCell">${r.name}</td><td class="pts">${r.points}</td><td>${r.matches_scored}</td></tr>`).join("");
   }
 
   document.querySelectorAll(".tab").forEach(t => {
@@ -549,6 +600,8 @@
     const btn = e.target.closest("button[data-save]");
     if (btn) savePrediction(Number(btn.dataset.save));
   });
+
+  document.getElementById("refreshLb")?.addEventListener("click", loadLeaderboard);
 
   showMe();
   loadMatches();
