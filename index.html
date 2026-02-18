@@ -356,6 +356,8 @@
 
       <div class="rules-box">
         <strong>قواعد النقاط:</strong> توقع النتيجة والأهداف بدقة (5ن) • توقع الفائز/التعادل صح والأهداف خطأ (3ن) • غير ذلك (0ن).
+        <br>
+        <small style="color:var(--y)">⚠️ يغلق باب التوقعات يومياً الساعة 5:00 مساءً.</small>
       </div>
 
       <div class="tableWrap">
@@ -383,12 +385,19 @@
 
   const ME_KEY = "ramadan_me_final_v1"; 
 
-  const RAMADAN_START_DATE = new Date("2026-02-18T18:00:00"); 
+  // بداية رمضان الافتراضية
+  const RAMADAN_START_DATE = new Date("2026-02-18T00:00:00"); 
 
+  /**
+   * دالة حساب الموعد النهائي (Deadline)
+   * يتم الإغلاق الساعة 5:00 مساءً (17:00) لكل يوم رمضاني
+   */
   function getMatchDeadline(ramadanDay) {
     const deadline = new Date(RAMADAN_START_DATE);
+    // إضافة عدد الأيام (نطرح 1 لأن اليوم الأول هو تاريخ البداية)
     deadline.setDate(deadline.getDate() + (parseInt(ramadanDay) - 1));
-    deadline.setHours(21, 0, 0, 0); 
+    // ضبط الساعة لـ 5:00 مساءً بتوقيت المتصفح (الذي يفترض أنه بتوقيت مصر للمستخدمين هناك)
+    deadline.setHours(17, 0, 0, 0); 
     return deadline;
   }
 
@@ -453,7 +462,7 @@
               ${(me && !isLocked && !played) ? "" : "disabled"}>حفظ</button>
           </div>
           ${!played && !isLocked ? `<div id="timer-${m.id}" class="countdown"></div>` : ""}
-          ${isLocked && !played ? `<div class="lock-info">🔒 مغلق</div>` : ""}
+          ${isLocked && !played ? `<div class="lock-info">🔒 التوقع مغلق (5:00م)</div>` : ""}
           ${played ? `<div class="lock-info" style="color:var(--g)">🏁 انتهت</div>` : ""}
         </div>
       `;
@@ -470,10 +479,16 @@
     const update = () => {
       const now = new Date();
       const diff = deadline - now;
-      if (diff <= 0) { el.textContent = "مغلق"; return; }
+      if (diff <= 0) { 
+        el.className = "lock-info";
+        el.textContent = "🔒 مغلق الآن"; 
+        // تعطيل المدخلات فوراً
+        document.querySelectorAll(`[data-match="${matchId}"]`).forEach(input => input.disabled = true);
+        return; 
+      }
       const h = Math.floor(diff / 3600000);
       const m = Math.floor((diff % 3600000) / 60000);
-      el.textContent = `قفل بعد: ${h}س ${m}د`;
+      el.textContent = `متبقي: ${h}س ${m}د للإغلاق`;
     };
     update();
     setInterval(update, 60000);
@@ -502,7 +517,9 @@
     if (!me) return alert("سجل اسمك أولاً");
     
     const { data: match } = await supabase.from("matches").select("day, score_a").eq("id", matchId).single();
-    if (match.score_a !== null || new Date() >= getMatchDeadline(match.day)) return alert("مغلق");
+    if (match.score_a !== null || new Date() >= getMatchDeadline(match.day)) {
+      return alert("عذراً، انتهى وقت التوقع لهذه المباراة.");
+    }
 
     const pA = document.querySelector(`input[data-match="${matchId}"][data-side="a"]`).value;
     const pB = document.querySelector(`input[data-match="${matchId}"][data-side="b"]`).value;
@@ -517,7 +534,7 @@
     
     if (!error) {
       const btn = document.querySelector(`button[data-save="${matchId}"]`);
-      btn.textContent = "✅";
+      btn.textContent = "✅ تم";
       setTimeout(()=> btn.textContent = "حفظ", 2000);
     }
   }
