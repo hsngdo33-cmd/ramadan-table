@@ -69,7 +69,7 @@
     }
 
     .tabs {
-      display: none; /* Hidden until login */
+      display: flex;
       gap: 8px;
       margin: 14px 0;
       overflow-x: auto;
@@ -271,9 +271,6 @@
     .badge-silver { background: #e2e2e2; color: #000; }
     .badge-bronze { background: #cd7f32; color: #fff; }
 
-    #authSection { transition: all 0.3s ease; }
-    #mainApp { display: none; }
-
     @media(max-width: 600px) {
       .player-list { grid-template-columns: 1fr; }
     }
@@ -283,58 +280,56 @@
   <div class="dua-tag">نسألكم الدعاء لابي الاستاذ محمد حسن عبدالرحمن</div>
 
   <div class="wrap">
-    <!-- شاشة تسجيل الدخول -->
-    <div id="authSection" class="card">
+    <div class="card">
       <h1>🏆 فانتزيا السرايا 2026</h1>
       <p class="muted">شارك بتوقعاتك واربح النقاط في دوري رمضان المبارك.</p>
       
       <div class="row" style="display:flex; gap:10px; margin-top:10px">
-        <input style="flex:1; padding:12px; border-radius:14px; border:1px solid var(--bd); background:rgba(255,255,255,.06); color:var(--t);" id="nameInput" placeholder="اكتب اسمك هنا للبدء..." />
-        <button class="btn primary" id="loginBtn">دخول</button>
+        <input style="flex:1; padding:12px; border-radius:14px; border:1px solid var(--bd); background:rgba(255,255,255,.06); color:var(--t);" id="name" placeholder="الاسم هنا..." />
+        <button class="btn primary" id="saveName">دخول</button>
       </div>
     </div>
 
-    <!-- التطبيق الرئيسي (يظهر بعد تسجيل الدخول) -->
-    <div id="mainApp">
-      <div class="tabs" style="display: flex;">
-        <div class="tab active" data-tab="matches">توقعاتي</div>
-        <div class="tab" data-tab="teams-standings">الترتيب</div>
-        <div class="tab" data-tab="leaderboard">فانتزيا</div>
-        <div class="tab" data-tab="squads">تشكيل الفرق</div>
+    <div class="tabs">
+      <div class="tab active" data-tab="matches">المباريات</div>
+      <div class="tab" data-tab="teams-standings">الترتيب</div>
+      <div class="tab" data-tab="leaderboard">فانتزيا</div>
+      <div class="tab" data-tab="squads">تشكيل الفرق</div>
+    </div>
+
+    <!-- المباريات -->
+    <div id="matches" class="grid"></div>
+
+    <!-- الترتيب -->
+    <div id="teams-standings" class="card" style="display:none">
+      <h1 style="margin-bottom:12px">🏆 ترتيب الفرق</h1>
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th style="text-align:right">الفريق</th><th>لعب</th><th>نقاط</th></tr>
+          </thead>
+          <tbody id="teamsBody"></tbody>
+        </table>
       </div>
+    </div>
 
-      <!-- المباريات (توقعاتي) -->
-      <div id="matches" class="grid"></div>
-
-      <!-- الترتيب -->
-      <div id="teams-standings" class="card" style="display:none">
-        <h1 style="margin-bottom:12px">🏆 ترتيب الفرق</h1>
-        <div class="tableWrap">
-          <table>
-            <thead>
-              <tr><th>#</th><th style="text-align:right">الفريق</th><th>لعب</th><th>نقاط</th></tr>
-            </thead>
-            <tbody id="teamsBody"></tbody>
-          </table>
-        </div>
+    <!-- فانتزيا -->
+    <div id="leaderboard" class="card" style="display:none">
+      <h1>📊 ترتيب فانتزيا</h1>
+      <div class="tableWrap" style="margin-top:15px">
+        <table>
+          <thead>
+            <tr><th>#</th><th style="text-align:right">المتوقع</th><th>النقاط</th></tr>
+          </thead>
+          <tbody id="lbBody"></tbody>
+        </table>
       </div>
+    </div>
 
-      <!-- فانتزيا -->
-      <div id="leaderboard" class="card" style="display:none">
-        <h1>📊 ترتيب فانتزيا</h1>
-        <div class="tableWrap" style="margin-top:15px">
-          <table>
-            <thead>
-              <tr><th>#</th><th style="text-align:right">المتوقع</th><th>النقاط</th></tr>
-            </thead>
-            <tbody id="lbBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- تشكيل الفرق -->
-      <div id="squads" style="display:none">
-        <div class="team-grid" id="squadsList"></div>
+    <!-- تشكيل الفرق -->
+    <div id="squads" style="display:none">
+      <div class="team-grid" id="squadsList">
+        <!-- الفرق ستضاف هنا عبر JS -->
       </div>
     </div>
   </div>
@@ -346,13 +341,11 @@
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  let currentUser = JSON.parse(localStorage.getItem('fantazia_user') || 'null');
-
   // بيانات الفرق
   const SQUADS_DATA = [
     {
       name: "أصدقاء محمد حسن",
-      players: ["محمد وليد معوض", "احمد صلاح", "ممدوح عاطف", "محمد المصري", "عمار لبيب", "احمد السيد صالح", "عمر لبيب", "احمد اشرف الامير", "محمد علي عوض", "كريم خليفه", "اسلام صادق"]
+      players: ["محمد وليد معوض", "احمد صلاح", "ممدوح عاطف", "محمد المصري", "عمار لبيب", "احمد السيد صالح", "عمر لبيب", "احمد اشرف الامير", "حسن محمد حسن", "محمد علي عوض", "كريم خليفه", "اسلام صادق"]
     },
     {
       name: "إيطاليانو كافيه",
@@ -368,7 +361,7 @@
     },
     {
       name: "أبو ملاك للموتسيكلات",
-      players: ["حسن محمد حسن", "احمد ياسر", "احمد رضا العيسوي", "محمد رفعت", "وليد ممدوح", "محمد العيسوي", "اشرف حسني", "عمر الهنداوى", "احمد الدريني", "محمد احمد عبده", "ايهاب البوب", "احمد كمال"]
+      players: [ "احمد ياسر", "احمد رضا العيسوي", "محمد رفعت", "وليد ممدوح", "محمد العيسوي", "اشرف حسني", "عمر الهنداوى", "احمد الدريني", "محمد احمد عبده", "ايهاب البوب", "احمد كمال"]
     },
     {
       name: "أصدقاء الفخراني",
@@ -379,87 +372,6 @@
       players: ["عبد الله محمد عبد الله", "جمال طارق العشري", "علي صبري", "هشام الخطيب", "رضا انور العيسوي", "احمد عادل صبري", "مصطفي حبيشي", "محمد حسن قش", "القطب فرج", "شعبان نادر", "محمد عادل شبانه"]
     }
   ];
-
-  // دالة تسجيل الدخول
-  document.getElementById('loginBtn').onclick = async () => {
-    const name = document.getElementById('nameInput').value.trim();
-    if (!name) return alert('الرجاء كتابة اسمك');
-
-    // البحث عن المستخدم أو إنشاء مستخدم جديد
-    let { data: user, error } = await supabase.from('participants').select('*').eq('name', name).single();
-    
-    if (!user) {
-      const { data: newUser, error: createError } = await supabase.from('participants').insert([{ name }]).select().single();
-      if (createError) return alert('حدث خطأ أثناء التسجيل');
-      user = newUser;
-    }
-
-    currentUser = user;
-    localStorage.setItem('fantazia_user', JSON.stringify(user));
-    showApp();
-  };
-
-  function showApp() {
-    document.getElementById('authSection').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
-    loadMatches();
-  }
-
-  // تحميل المباريات والتوقعات
-  async function loadMatches() {
-    const { data: matches } = await supabase.from("matches").select("*").order("day", { ascending: true });
-    const { data: predictions } = await supabase.from("predictions").select("*").eq('participant_id', currentUser.id);
-    
-    const root = document.getElementById("matches");
-    root.innerHTML = matches.map((m, i) => {
-      const pred = predictions.find(p => p.match_id === m.id);
-      const isPlayed = m.score_a !== null;
-
-      return `
-        <div class="match">
-          <div class="top">
-            <div style="font-weight:bold">🌙 ${i === 0 ? 'الافتتاح' : i + ' رمضان'}</div>
-            <div class="tag">${isPlayed ? 'انتهت' : 'قادمة'}</div>
-          </div>
-          <div class="teams-vs">
-            <div class="team-name">${m.team_a}</div>
-            <div class="vs">VS</div>
-            <div class="team-name">${m.team_b}</div>
-          </div>
-          <div class="score-area">
-            ${isPlayed ? `<div style="font-size:14px; color:var(--g); font-weight:bold;">النتيجة الحقيقية: ${m.score_a} - ${m.score_b}</div>` : ''}
-            <div class="box">
-              <input class="num" type="number" id="predA_${m.id}" value="${pred ? pred.pred_a : ''}" ${isPlayed ? 'disabled' : ''} placeholder="0">
-              <span>توقعك</span>
-              <input class="num" type="number" id="predB_${m.id}" value="${pred ? pred.pred_b : ''}" ${isPlayed ? 'disabled' : ''} placeholder="0">
-              ${!isPlayed ? `<button class="btn primary save-pred" data-match="${m.id}">حفظ التوقع</button>` : ''}
-            </div>
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    // تفعيل أزرار الحفظ
-    document.querySelectorAll('.save-pred').forEach(btn => {
-      btn.onclick = async () => {
-        const matchId = btn.dataset.match;
-        const predA = parseInt(document.getElementById(`predA_${matchId}`).value);
-        const predB = parseInt(document.getElementById(`predB_${matchId}`).value);
-
-        if (isNaN(predA) || isNaN(predB)) return alert('يرجى إدخال التوقع بشكل صحيح');
-
-        const { error } = await supabase.from('predictions').upsert({
-          participant_id: currentUser.id,
-          match_id: matchId,
-          pred_a: predA,
-          pred_b: predB
-        }, { onConflict: 'participant_id,match_id' });
-
-        if (error) alert('خطأ أثناء الحفظ');
-        else alert('تم حفظ توقعك بنجاح ✅');
-      };
-    });
-  }
 
   function loadSquads() {
     const list = document.getElementById("squadsList");
@@ -472,6 +384,31 @@
         <ul class="player-list">
           ${team.players.map(p => `<li class="player-item">${p}</li>`).join("")}
         </ul>
+      </div>
+    `).join("");
+  }
+
+  async function loadMatches() {
+    const { data: matches } = await supabase.from("matches").select("*").order("day", { ascending: true });
+    const root = document.getElementById("matches");
+    if(!root) return;
+    root.innerHTML = matches.map((m, i) => `
+      <div class="match">
+        <div class="top"><div style="font-weight:bold">🌙 ${i === 0 ? 'الافتتاح' : i + ' رمضان'}</div><div class="tag">مباراة ${i+1}</div></div>
+        <div class="teams-vs">
+          <div class="team-name">${m.team_a}</div>
+          <div class="vs">VS</div>
+          <div class="team-name">${m.team_b}</div>
+        </div>
+        <div class="score-area">
+          <div style="font-size:11px; color:var(--m)">${m.score_a !== null ? `النتيجة: ${m.score_a} - ${m.score_b}` : "⌛ لم تبدأ"}</div>
+          <div class="box">
+            <input class="num" type="number" placeholder="0" data-match="${m.id}" data-side="a">
+            <span>-</span>
+            <input class="num" type="number" placeholder="0" data-match="${m.id}" data-side="b">
+            <button class="btn primary" onclick="alert('سجل دخولك أولاً')">حفظ</button>
+          </div>
+        </div>
       </div>
     `).join("");
   }
@@ -489,8 +426,8 @@
       predictions.filter(pr => pr.participant_id === p.id).forEach(pr => {
         const m = matchMap[pr.match_id];
         if (!m) return;
-        if (m.score_a === pr.pred_a && m.score_b === pr.pred_b) pts += 5; // نتيجة صحيحة
-        else if ((m.score_a > m.score_b && pr.pred_a > pr.pred_b) || (m.score_a < m.score_b && pr.pred_a < pr.pred_b) || (m.score_a === m.score_b && pr.pred_a === pr.pred_b)) pts += 3; // اتجاه صحيح
+        if (m.score_a === pr.pred_a && m.score_b === pr.pred_b) pts += 5;
+        else if ((m.score_a > m.score_b && pr.pred_a > pr.pred_b) || (m.score_a < m.score_b && pr.pred_a < pr.pred_b) || (m.score_a === m.score_b && pr.pred_a === pr.pred_b)) pts += 3;
       });
       return { name: p.name, points: pts };
     }).sort((a,b) => b.points - a.points);
@@ -498,11 +435,12 @@
     document.getElementById("lbBody").innerHTML = leaderData.map((r, i) => {
       let badge = "";
       if (i === 0) badge = '<span class="badge badge-gold">الملك 👑</span>';
-      return `<tr><td>${i+1}</td><td style="text-align:right">${badge}${r.name}</td><td class="pts">${r.points}</td></tr>`;
+      else if (i === 1) badge = '<span class="badge badge-silver">الوصيف 🥈</span>';
+      else if (i === 2) badge = '<span class="badge badge-bronze">البرونز 🥉</span>';
+      return `<tr class="${i < 3 ? 'rank-1' : ''}"><td>${i+1}</td><td style="text-align:right">${badge}${r.name}</td><td class="pts">${r.points}</td></tr>`;
     }).join("");
   }
 
-  // التبديل بين التبويبات
   document.querySelectorAll(".tab").forEach(t => {
     t.addEventListener("click", () => {
       document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
@@ -518,10 +456,7 @@
     });
   });
 
-  // التحقق من الجلسة عند التحميل
-  if (currentUser) {
-    showApp();
-  }
+  loadMatches();
 </script>
 </body>
 </html>
