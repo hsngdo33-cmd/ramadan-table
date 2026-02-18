@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>فانتزيا السرايا 2026</title>
   <style>
     :root {
@@ -17,297 +17,276 @@
       --error: #ff6b6b;
     }
 
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
       margin: 0;
-      font-family: system-ui, Segoe UI, Tahoma, Arial, sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       color: var(--t);
-      background: radial-gradient(900px 500px at 80% 10%, rgba(71, 240, 179, .12), transparent 62%),
-                  radial-gradient(1200px 600px at 20% 10%, rgba(255, 211, 106, .14), transparent 60%),
-                  linear-gradient(180deg, var(--bg), var(--bg2));
+      background: var(--bg);
+      background-attachment: fixed;
+      background-image: radial-gradient(circle at top right, rgba(71, 240, 179, 0.08), transparent),
+                        radial-gradient(circle at top left, rgba(255, 211, 106, 0.08), transparent);
       min-height: 100vh;
-      position: relative;
+      line-height: 1.5;
+      overflow-x: hidden;
     }
 
     .dua-tag {
       position: fixed;
-      bottom: 10px;
-      left: 10px;
-      background: rgba(255, 211, 106, 0.15);
-      border: 1px solid rgba(255, 211, 106, 0.3);
-      padding: 8px 12px;
-      border-radius: 12px;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(11, 27, 58, 0.95);
+      border-top: 1px solid var(--y);
+      padding: 10px;
+      text-align: center;
       font-size: 11px;
       color: var(--y);
-      backdrop-filter: blur(5px);
-      z-index: 1000;
+      backdrop-filter: blur(10px);
+      z-index: 2000;
       font-weight: bold;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
 
     .wrap {
-      max-width: 980px;
+      width: 100%;
+      max-width: 600px;
       margin: 0 auto;
-      padding: 16px;
+      padding: 12px 12px 60px 12px;
     }
 
     .card {
-      background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .03));
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--bd);
-      border-radius: 18px;
-      padding: 14px;
-      box-shadow: 0 14px 50px rgba(0, 0, 0, .45);
-      margin-bottom: 20px;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
     }
 
-    h1 { margin: 0; font-size: 20px; }
-
-    .muted {
-      color: var(--m);
-      font-weight: 700;
-      font-size: 13px;
-      margin: 6px 0 0;
-    }
+    .header-main h1 { font-size: 22px; margin: 0; color: var(--y); }
+    .header-main p { font-size: 13px; margin: 4px 0 0; color: var(--m); }
 
     .tabs {
       display: flex;
-      gap: 8px;
-      margin: 14px 0;
-      overflow-x: auto;
-      padding-bottom: 5px;
+      gap: 6px;
+      margin: 16px 0;
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+      background: rgba(7, 10, 26, 0.8);
+      padding: 4px;
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
     }
 
     .tab {
       flex: 1;
-      min-width: 90px;
       text-align: center;
-      padding: 10px 6px;
-      border-radius: 14px;
-      border: 1px solid var(--bd);
-      background: rgba(255, 255, 255, .04);
-      font-weight: 1000;
+      padding: 10px 4px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      font-weight: bold;
       cursor: pointer;
-      white-space: nowrap;
-      font-size: 13px;
+      font-size: 12px;
+      border: 1px solid transparent;
+      transition: 0.2s;
+      color: var(--m);
     }
 
     .tab.active {
-      background: rgba(71, 240, 179, .10);
-      border-color: rgba(71, 240, 179, .22);
-      color: var(--g);
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
     }
-
-    .grid { display: grid; gap: 12px; }
 
     .match {
+      background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--bd);
-      border-radius: 18px;
-      padding: 14px;
-      background: rgba(0, 0, 0, .16);
-      position: relative;
-    }
-
-    .match.opening {
-      border: 1px solid var(--y);
-      background: linear-gradient(135deg, rgba(255, 211, 106, 0.1), rgba(0,0,0,0.2));
-    }
-
-    .top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
+      border-radius: 16px;
+      padding: 16px;
       margin-bottom: 12px;
     }
 
-    .tag {
-      padding: 6px 10px;
-      border-radius: 12px;
-      border: 1px solid rgba(124, 92, 255, .22);
-      background: rgba(124, 92, 255, .12);
-      color: #d9d4ff;
-      font-weight: 900;
-      font-size: 11px;
-    }
-
-    .bottom-timer {
-      margin-top: 12px;
-      padding: 10px;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
-      text-align: center;
-      font-size: 12px;
-      color: var(--y);
-      border: 1px solid rgba(255, 211, 106, 0.15);
-      font-family: system-ui, sans-serif;
-    }
-
-    .lock-status {
-       font-size: 10px;
-       color: #ff6b6b;
-       margin-top: 4px;
-       font-weight: bold;
-    }
-
-    .teams-vs {
+    .top-info {
       display: flex;
       justify-content: space-between;
+      font-size: 11px;
+      margin-bottom: 12px;
+    }
+
+    .timer-display {
+      background: rgba(255, 211, 106, 0.1);
+      color: var(--y);
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-weight: bold;
+    }
+
+    .teams-grid {
+      display: grid;
+      grid-template-columns: 1fr 40px 1fr;
       align-items: center;
+      text-align: center;
       gap: 8px;
-      margin-top: 10px;
     }
 
     .team-name {
-      flex: 1;
-      padding: 10px 4px;
-      border-radius: 14px;
-      border: 1px solid var(--bd);
-      background: rgba(255, 255, 255, .05);
-      text-align: center;
-      font-weight: 1100;
-      font-size: 13px;
-    }
-
-    .vs {
-      padding: 4px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255, 211, 106, .20);
-      background: rgba(255, 211, 106, .10);
-      color: var(--y);
-      font-weight: 1200;
-      font-size: 12px;
-    }
-
-    .score-area {
+      font-weight: bold;
+      font-size: 14px;
+      background: rgba(255,255,255,0.05);
+      padding: 12px 4px;
+      border-radius: 10px;
+      min-height: 45px;
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 10px;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px dashed var(--bd);
-    }
-
-    .box {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      border: 1px solid var(--bd);
-      background: rgba(255, 255, 255, .04);
-      border-radius: 14px;
-      padding: 8px;
-      width: 100%;
       justify-content: center;
     }
 
-    .num {
-      width: 45px;
-      padding: 8px 4px;
-      border-radius: 10px;
+    .vs-circle {
+      width: 32px;
+      height: 32px;
+      background: var(--y);
+      color: #000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 900;
+      margin: 0 auto;
+    }
+
+    .prediction-row {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--bd);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .num-input {
+      width: 50px;
+      height: 40px;
+      background: #000;
       border: 1px solid var(--bd);
-      background: rgba(255, 255, 255, .06);
-      color: var(--t);
-      font-weight: 1100;
+      border-radius: 8px;
+      color: #fff;
       text-align: center;
-      font-size: 15px;
+      font-size: 18px;
+      font-weight: bold;
     }
 
-    .btn {
-      padding: 12px 14px;
-      border-radius: 14px;
-      border: 1px solid var(--bd);
-      background: rgba(255, 255, 255, .06);
-      color: var(--t);
-      font-weight: 1000;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn.primary {
-      border-color: rgba(255, 211, 106, .32);
-      background: rgba(255, 211, 106, .10);
-      color: var(--y);
-    }
-
-    .tableWrap {
+    .table-container {
+      width: 100%;
       overflow-x: auto;
-      border-radius: 14px;
-      border: 1px solid var(--bd);
-      background: rgba(0, 0, 0, .16);
-      margin-top: 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.2);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 400px;
+      font-size: 12px;
     }
 
-    th, td {
-      padding: 10px;
+    th {
+      background: rgba(255,255,255,0.05);
+      padding: 12px 8px;
+      color: var(--y);
       text-align: center;
-      border-bottom: 1px solid rgba(255, 255, 255, .08);
-      font-size: 13px;
     }
 
-    .pts { color: var(--g); font-weight: 1200; font-size: 14px; }
+    td {
+      padding: 12px 8px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
 
-    /* تمييز المراكز الثلاثة الأولى في الفانتزيا */
-    .rank-1 { background: rgba(255, 211, 106, 0.1); }
-    .rank-2 { background: rgba(192, 192, 192, 0.05); }
-    .rank-3 { background: rgba(205, 127, 50, 0.05); }
-    
-    .badge {
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 6px;
-      margin-right: 5px;
+    .pts-badge {
+      color: var(--g);
       font-weight: bold;
     }
-    .badge-gold { background: var(--y); color: #000; }
-    .badge-silver { background: #e0e0e0; color: #000; }
-    .badge-bronze { background: #cd7f32; color: #fff; }
 
-    .team-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 15px;
+    .badge-label {
+      font-size: 10px;
+      display: block;
+      color: var(--m);
+      opacity: 0.8;
+      margin-top: 2px;
     }
 
-    .squad-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--bd);
-      border-radius: 15px;
+    .squad-item {
+      margin-bottom: 12px;
       padding: 12px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      border: 1px solid var(--bd);
     }
 
-    .squad-title {
+    .squad-head {
       color: var(--y);
-      border-bottom: 1px solid rgba(255, 211, 106, 0.2);
-      padding-bottom: 8px;
-      margin-bottom: 10px;
-      font-size: 15px;
-      font-weight: 1000;
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 14px;
+      border-bottom: 1px solid rgba(255,211,106,0.1);
+      padding-bottom: 4px;
+    }
+
+    .players-flex {
       display: flex;
-      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
-    .player-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .player-item {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 6px 8px;
-      border-radius: 8px;
-      font-size: 12px;
+    .player-chip {
+      background: rgba(124, 92, 255, 0.1);
       color: var(--t);
-      border-right: 3px solid var(--accent);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      border: 1px solid rgba(124, 92, 255, 0.2);
+    }
+
+    .btn-save {
+      background: var(--g);
+      color: #000;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .btn-login {
+      background: var(--y);
+      color: #000;
+      border: none;
+      padding: 0 20px;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .rank-gold { background: rgba(255, 211, 106, 0.15) !important; }
+    .rank-silver { background: rgba(192, 192, 192, 0.1) !important; }
+    .rank-bronze { background: rgba(205, 127, 50, 0.1) !important; }
+    
+    input[type="text"], input[type="number"] {
+      font-size: 16px !important;
+    }
+
+    #userInfo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 15px;
     }
   </style>
 </head>
@@ -315,59 +294,76 @@
   <div class="dua-tag">نسألكم الدعاء لابي الاستاذ محمد حسن عبدالرحمن</div>
 
   <div class="wrap">
-    <div class="header-main" style="text-align: center; margin-bottom: 10px;">
+    <div class="header-main" style="text-align: center;">
       <h1>🏆 فانتزيا السرايا 2026</h1>
-      <p class="muted">دوري السرايا الرمضاني لكرة القدم</p>
+      <p>دوري السرايا الرمضاني</p>
     </div>
 
-    <div id="authSection" class="card">
-      <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <span style="color:var(--y); font-weight: 800; font-size: 14px;">👋 أهلاً بك! سجل اسمك للمشاركة والتوقع</span>
-      </div>
-      <div class="row" style="display:flex; gap:10px;">
-        <!-- تم تحديث النص هنا بناءً على طلبك -->
-        <input style="flex:1; padding:12px; border-radius:14px; border:1px solid var(--bd); background:rgba(0,0,0,.2); color:var(--t);" id="nameInput" placeholder="اكتب اسمك..." />
-        <button class="btn primary" id="loginBtn">دخول</button>
+    <!-- قسم تسجيل الدخول -->
+    <div id="authSection" class="card" style="margin-top:15px;">
+      <p style="margin:0 0 10px; font-size:12px; text-align:center;">سجل اسمك للمشاركة في التوقعات</p>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="nameInput" placeholder="اكتب اسمك" style="flex:1; height:45px; border-radius:10px; border:1px solid var(--bd); background:#000; color:#fff; padding:0 12px;">
+        <button id="loginBtn" class="btn-login">دخول</button>
       </div>
     </div>
 
-    <div class="tabs" id="mainTabs">
+    <!-- قسم عرض معلومات المستخدم بعد الدخول -->
+    <div id="userInfo" class="card" style="display:none; margin-top:15px;">
+        <span id="welcomeText" style="color:var(--y); font-weight:bold;"></span>
+        <button onclick="logout()" style="background:none; border:1px solid var(--error); color:var(--error); padding:4px 8px; border-radius:6px; font-size:11px; cursor:pointer;">خروج</button>
+    </div>
+
+    <div class="tabs">
       <div class="tab active" data-tab="matches">المباريات</div>
-      <div class="tab" data-tab="teams-standings">الترتيب</div>
-      <div class="tab" data-tab="leaderboard">فانتزيا</div>
-      <div class="tab" data-tab="squads">الفرق</div>
+      <div class="tab" data-tab="standings">الترتيب</div>
+      <div class="tab" data-tab="fantasy">الفانتزيا</div>
+      <div class="tab" data-tab="teams">الفرق</div>
     </div>
 
-    <div id="mainApp">
-      <div id="matches" class="grid"></div>
+    <div id="matches-content">
+      <div id="matchesList"></div>
+    </div>
 
-      <div id="teams-standings" class="card" style="display:none">
-        <h1 style="margin-bottom:12px">🏆 ترتيب الفرق</h1>
-        <div class="tableWrap">
+    <div id="standings-content" style="display:none;">
+      <div class="card">
+        <h2 style="font-size:16px; margin-top:0;">🏆 ترتيب الفرق</h2>
+        <div class="table-container">
           <table>
             <thead>
-              <tr><th>#</th><th style="text-align:right">الفريق</th><th>لعب</th><th>فوز</th><th>تعادل</th><th>له</th><th>عليه</th><th>نقاط</th></tr>
+              <tr>
+                <th>#</th>
+                <th style="text-align:right">الفريق</th>
+                <th>لعب</th>
+                <th>نقاط</th>
+              </tr>
             </thead>
             <tbody id="teamsBody"></tbody>
           </table>
         </div>
       </div>
+    </div>
 
-      <div id="leaderboard" class="card" style="display:none">
-        <h1>📊 ترتيب فانتزيا</h1>
-        <div class="tableWrap" style="margin-top:15px">
+    <div id="fantasy-content" style="display:none;">
+      <div class="card">
+        <h2 style="font-size:16px; margin-top:0;">📊 ترتيب المتوقعين</h2>
+        <div class="table-container">
           <table>
             <thead>
-              <tr><th>#</th><th style="text-align:right">المتوقع</th><th>النقاط</th></tr>
+              <tr>
+                <th>#</th>
+                <th style="text-align:right">المشارك</th>
+                <th>النقاط</th>
+              </tr>
             </thead>
-            <tbody id="lbBody"></tbody>
+            <tbody id="fantasyBody"></tbody>
           </table>
         </div>
       </div>
+    </div>
 
-      <div id="squads" style="display:none">
-        <div class="team-grid" id="squadsList"></div>
-      </div>
+    <div id="teams-content" style="display:none;">
+      <div id="squadsList"></div>
     </div>
   </div>
 
@@ -379,9 +375,9 @@
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   let currentUser = JSON.parse(localStorage.getItem('fantazia_user') || 'null');
-  let timers = {};
-
-  const SQUADS_DATA = [
+  let countdownIntervals = {};
+  
+  const SQUADS = [
     { name: "أصدقاء محمد حسن", players: ["محمد وليد معوض", "احمد صلاح", "ممدوح عاطف", "محمد المصري", "عمار لبيب", "احمد السيد صالح", "عمر لبيب", "احمد اشرف الامير", "محمد علي عوض", "كريم خليفه", "اسلام صادق"] },
     { name: "إيطاليانو كافيه", players: ["تامر عبد الرحمن", "محمد طه", "علي صبري", "امير علي", "الشحات صلاح", "جلال شبانه", "محمد ابراهيم صالح", "ماهر المنسي", "رضا صادق", "اسامه صلاح", "محمد القلش", "محمود اسلام"] },
     { name: "البودي", players: ["عمر عادل المخزنجي", "زياد الديسطي", "اشرف السيد درماله", "محمد السيد برهام", "احمد ايهاب البلطجي", "طارق مطاوع", "محمد حسني", "عبد الوهاب القاضي", "مازن علي الكردي", "احمد محمد حسن", "محمد عادل البرمه"] },
@@ -391,283 +387,266 @@
     { name: "أولاد حبيشي للجبس", players: ["عبد الله محمد عبد الله", "جمال طارق العشري", "علي صبري", "هشام الخطيب", "رضا انور العيسوي", "احمد عادل صبري", "مصطفي حبيشي", "محمد حسن قش", "القطب فرج", "شعبان نادر", "محمد عادل شبانه"] }
   ];
 
-  async function handleLogin() {
-    const input = document.getElementById('nameInput');
-    const name = input.value.trim();
-    if (!name) return alert('الرجاء كتابة اسمك');
+  // دالة تسجيل الدخول المحسنة
+  async function login() {
+    const nameInput = document.getElementById('nameInput');
+    const name = nameInput.value.trim();
+    if (!name) return alert('برجاء ادخال الاسم للمشاركة');
     
     try {
-      let { data: user } = await supabase.from('participants').select('*').eq('name', name).maybeSingle();
-      if (!user) {
-        const { data: newUser, error } = await supabase.from('participants').insert([{ name }]).select().single();
-        if (error) throw error;
-        user = newUser;
-      }
-      currentUser = user;
-      localStorage.setItem('fantazia_user', JSON.stringify(user));
-      checkUserStatus();
-      loadMatches();
-    } catch (e) { alert('خطأ في التسجيل'); }
+        // البحث عن المستخدم أو إنشاؤه
+        let { data: user, error: fetchError } = await supabase.from('participants').select('*').eq('name', name).maybeSingle();
+        
+        if (!user) {
+            const { data: newUser, error: insertError } = await supabase.from('participants').insert([{ name }]).select().single();
+            if (insertError) throw insertError;
+            user = newUser;
+        }
+
+        currentUser = user;
+        localStorage.setItem('fantazia_user', JSON.stringify(user));
+        
+        // تحديث الواجهة فوراً بدلاً من عمل reload
+        updateAuthUI();
+        loadMatches(); 
+        alert(`أهلاً بك يا ${name}! يمكنك الآن وضع توقعاتك.`);
+    } catch (err) {
+        console.error(err);
+        alert('حدث خطأ في الاتصال، تأكد من وجود إنترنت وحاول مرة أخرى');
+    }
   }
 
-  function checkUserStatus() {
-    document.getElementById('authSection').style.display = currentUser ? 'none' : 'block';
+  // تحديث حالة تسجيل الدخول في الواجهة
+  function updateAuthUI() {
+    const authSection = document.getElementById('authSection');
+    const userInfo = document.getElementById('userInfo');
+    const welcomeText = document.getElementById('welcomeText');
+
+    if (currentUser) {
+        authSection.style.display = 'none';
+        userInfo.style.display = 'flex';
+        welcomeText.innerText = `مرحباً، ${currentUser.name}`;
+    } else {
+        authSection.style.display = 'block';
+        userInfo.style.display = 'none';
+    }
   }
 
-  function initMatchLogic(matchId, orderIndex) {
-    if (timers[matchId]) clearInterval(timers[matchId]);
+  // دالة تسجيل الخروج
+  window.logout = () => {
+    localStorage.removeItem('fantazia_user');
+    currentUser = null;
+    updateAuthUI();
+    loadMatches();
+  };
+
+  function startCountdown(matchId, targetDate) {
+    if (countdownIntervals[matchId]) clearInterval(countdownIntervals[matchId]);
     
-    const closeDate = new Date(2026, 1, 18 + orderIndex, 17, 0, 0);
-
     const update = () => {
       const now = new Date();
-      const diff = closeDate.getTime() - now.getTime();
-      const timerEl = document.getElementById(`timer_${matchId}`);
-      const btn = document.querySelector(`.save-pred[data-match="${matchId}"]`);
-      const inputs = document.querySelectorAll(`.num[id*="_${matchId}"]`);
-
-      if (!timerEl) return;
+      const diff = targetDate - now;
+      const el = document.getElementById(`timer_${matchId}`);
+      
+      if (!el) return;
 
       if (diff <= 0) {
-        timerEl.innerHTML = `<span style="color:#ff6b6b">🔒 تم غلق التوقعات (مغلق 5:00 م)</span>`;
-        if (btn) btn.style.display = 'none';
+        el.innerHTML = "🔒 مغلق";
+        el.style.color = "var(--error)";
+        el.classList.remove('timer-display');
+        const inputs = document.querySelectorAll(`[id*="_${matchId}"]`);
         inputs.forEach(i => i.disabled = true);
-        clearInterval(timers[matchId]);
+        const btn = document.querySelector(`.btn-save[onclick*="${matchId}"]`);
+        if (btn) btn.remove();
+        clearInterval(countdownIntervals[matchId]);
       } else {
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const secs = Math.floor((diff % (1000 * 60)) / 1000);
-        
-        const fH = String(hours).padStart(2, '0');
-        const fM = String(mins).padStart(2, '0');
-        const fS = String(secs).padStart(2, '0');
-
-        timerEl.innerHTML = `⏳ متبقي على القفل: <b style="font-family:monospace; font-size:14px">${fH}:${fM}:${fS}</b>`;
+        const hours = Math.floor(diff / 3600000);
+        const mins = Math.floor((diff % 3600000) / 60000);
+        const secs = Math.floor((diff % 60000) / 1000);
+        el.innerHTML = `⏳ ${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
       }
     };
-
     update();
-    timers[matchId] = setInterval(update, 1000);
+    countdownIntervals[matchId] = setInterval(update, 1000);
   }
 
   async function loadMatches() {
     const { data: matches } = await supabase.from("matches").select("*").order("day", { ascending: true });
-    let predictions = [];
+    let preds = [];
     if (currentUser) {
-      const { data: pr } = await supabase.from("predictions").select("*").eq('participant_id', currentUser.id);
-      predictions = pr || [];
+      const { data: p } = await supabase.from("predictions").select("*").eq('participant_id', currentUser.id);
+      preds = p || [];
     }
-    
-    const now = new Date();
-    const root = document.getElementById("matches");
-    root.innerHTML = (matches || []).map((m, i) => {
-      const pred = predictions.find(p => p.match_id === m.id);
+
+    const container = document.getElementById('matchesList');
+    if (!matches || matches.length === 0) {
+        container.innerHTML = `<div class='card' style='text-align:center;'>جاري تحميل المباريات...</div>`;
+        return;
+    }
+
+    container.innerHTML = matches.map((m, i) => {
+      const pred = preds.find(x => x.match_id === m.id);
       const isPlayed = m.score_a !== null;
-      
-      let dateLabel = "";
-      let orderIndex = i; 
-      
-      if (i === 0) {
-          dateLabel = "⭐ افتتاحية البطولة (18/2)";
-      } else if (i === 1) {
-          dateLabel = "🌙 1 رمضان (19/2)";
-      } else {
-          dateLabel = `🌙 ${i} رمضان (${18 + i}/2)`;
-      }
-      
-      const closeLimit = new Date(2026, 1, 18 + orderIndex, 17, 0, 0);
-      let isLocked = isPlayed || (now > closeLimit);
+      // وقت غلق التوقعات هو الساعة 5 مساءً في يوم المباراة (أيام فبراير/مارس 2026 الافتراضية)
+      const closeDate = new Date(2026, 1, 18 + i, 17, 0, 0); 
+      const isLocked = isPlayed || (new Date() > closeDate);
 
       return `
-        <div class="match ${i === 0 ? 'opening' : ''}">
-          <div class="top">
-            <div style="font-weight:bold">${dateLabel}</div>
-            <div class="tag">${isPlayed ? 'انتهت' : 'قادمة'}</div>
+        <div class="match">
+          <div class="top-info">
+            <span style="color:var(--y)">📅 ${i === 0 ? 'الافتتاح' : i + ' رمضان'}</span>
+            <span id="timer_${m.id}" class="${!isLocked ? 'timer-display' : ''}" style="color:${isLocked ? 'var(--error)' : 'var(--y)'}">
+                ${isLocked ? '🔒 مغلق' : 'حساب الوقت...'}
+            </span>
           </div>
-          <div class="teams-vs">
+          <div class="teams-grid">
             <div class="team-name">${m.team_a}</div>
-            <div class="vs">VS</div>
+            <div class="vs-circle">${isPlayed ? m.score_a + ':' + m.score_b : 'VS'}</div>
             <div class="team-name">${m.team_b}</div>
           </div>
-          
-          ${!isPlayed ? `<div class="bottom-timer" id="timer_${m.id}">جاري حساب الوقت...</div>` : ''}
-
-          <div class="score-area">
-            ${isPlayed ? `<div style="font-size:14px; color:var(--g); font-weight:bold; margin-bottom:8px">النتيجة النهائية: ${m.score_a} - ${m.score_b}</div>` : ""}
-            <div class="box">
-              <input class="num" type="number" id="predA_${m.id}" value="${pred ? pred.pred_a : ''}" ${isLocked || !currentUser ? 'disabled' : ''} placeholder="0">
-              <span style="font-size:11px; opacity:0.7">توقعك</span>
-              <input class="num" type="number" id="predB_${m.id}" value="${pred ? pred.pred_b : ''}" ${isLocked || !currentUser ? 'disabled' : ''} placeholder="0">
-              ${!isLocked && currentUser ? `<button class="btn primary save-pred" data-match="${m.id}" style="padding: 6px 12px; font-size: 11px; margin-right: 5px;">حفظ</button>` : ''}
-            </div>
-            ${isLocked && !isPlayed ? '<div class="lock-status">🔒 تم غلق استقبال التوقعات</div>' : ''}
+          <div class="prediction-row">
+            <input type="number" class="num-input" id="pA_${m.id}" value="${pred?.pred_a ?? ''}" ${isLocked || !currentUser ? 'disabled' : ''} placeholder="-">
+            <span style="font-size:10px; color:var(--m)">توقعك</span>
+            <input type="number" class="num-input" id="pB_${m.id}" value="${pred?.pred_b ?? ''}" ${isLocked || !currentUser ? 'disabled' : ''} placeholder="-">
+            ${!isLocked && currentUser ? `<button class="btn-save" onclick="savePred('${m.id}')">حفظ</button>` : ''}
           </div>
         </div>
       `;
     }).join("");
 
     matches.forEach((m, i) => {
-      if (m.score_a === null) {
-        initMatchLogic(m.id, i);
+      const isPlayed = m.score_a !== null;
+      const closeDate = new Date(2026, 1, 18 + i, 17, 0, 0);
+      if (!isPlayed && new Date() < closeDate) {
+        startCountdown(m.id, closeDate);
       }
-    });
-
-    document.querySelectorAll('.save-pred').forEach(btn => {
-      btn.onclick = async () => {
-        const matchId = btn.dataset.match;
-        const vA = parseInt(document.getElementById(`predA_${matchId}`).value);
-        const vB = parseInt(document.getElementById(`predB_${matchId}`).value);
-        if (isNaN(vA) || isNaN(vB)) return alert('أدخل التوقعات');
-
-        btn.disabled = true;
-        const { error } = await supabase.from('predictions').upsert({
-          participant_id: currentUser.id,
-          match_id: matchId,
-          pred_a: vA,
-          pred_b: vB
-        }, { onConflict: 'participant_id,match_id' });
-
-        if (error) alert('فشل الحفظ'); else alert('تم الحفظ بنجاح ✅');
-        btn.disabled = false;
-      };
     });
   }
 
-  async function loadTeamsStandings() {
+  window.savePred = async (matchId) => {
+    const vA = document.getElementById(`pA_${matchId}`).value;
+    const vB = document.getElementById(`pB_${matchId}`).value;
+    if (vA === "" || vB === "") return alert("ادخل التوقعات أولاً");
+
+    const { error } = await supabase.from('predictions').upsert({
+      participant_id: currentUser.id,
+      match_id: matchId,
+      pred_a: parseInt(vA),
+      pred_b: parseInt(vB)
+    }, { onConflict: 'participant_id,match_id' });
+
+    if (!error) alert("تم حفظ توقعك بنجاح ✅");
+    else alert("حدث خطأ أثناء الحفظ، حاول مرة أخرى");
+  };
+
+  async function loadStandings() {
     const { data: matches } = await supabase.from("matches").select("*").not("score_a", "is", null);
     const table = {};
+    SQUADS.forEach(s => table[s.name] = { p: 0, pts: 0 });
 
-    SQUADS_DATA.forEach(t => {
-      table[t.name] = { played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, pts: 0 };
+    matches?.forEach(m => {
+      if (!table[m.team_a]) table[m.team_a] = { p:0, pts:0 };
+      if (!table[m.team_b]) table[m.team_b] = { p:0, pts:0 };
+      table[m.team_a].p++; table[m.team_b].p++;
+      if (m.score_a > m.score_b) table[m.team_a].pts += 3;
+      else if (m.score_b > m.score_a) table[m.team_b].pts += 3;
+      else { table[m.team_a].pts += 1; table[m.team_b].pts += 1; }
     });
 
-    (matches || []).forEach(m => {
-      if (!table[m.team_a]) table[m.team_a] = { played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, pts: 0 };
-      if (!table[m.team_b]) table[m.team_b] = { played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, pts: 0 };
-
-      const tA = table[m.team_a];
-      const tB = table[m.team_b];
-
-      tA.played++;
-      tB.played++;
-      tA.gf += m.score_a;
-      tA.ga += m.score_b;
-      tB.gf += m.score_b;
-      tB.ga += m.score_a;
-
-      if (m.score_a > m.score_b) {
-        tA.won++; tA.pts += 3; tB.lost++;
-      } else if (m.score_a < m.score_b) {
-        tB.won++; tB.pts += 3; tA.lost++;
-      } else {
-        tA.drawn++; tA.pts += 1; tB.drawn++; tB.pts += 1;
-      }
-    });
-
-    const sorted = Object.entries(table).map(([name, stats]) => ({ name, ...stats }))
-      .sort((a, b) => b.pts - a.pts || (b.gf - b.ga) - (a.gf - a.ga) || b.gf - a.gf);
-
-    document.getElementById("teamsBody").innerHTML = sorted.map((t, i) => `
+    const sorted = Object.entries(table).sort((a,b) => b[1].pts - a[1].pts);
+    document.getElementById('teamsBody').innerHTML = sorted.map((t, i) => `
       <tr>
         <td>${i+1}</td>
-        <td style="text-align:right; font-weight:bold">${t.name}</td>
-        <td>${t.played}</td>
-        <td>${t.won}</td>
-        <td>${t.drawn}</td>
-        <td>${t.gf}</td>
-        <td>${t.ga}</td>
-        <td class="pts">${t.pts}</td>
+        <td style="text-align:right">${t[0]}</td>
+        <td>${t[1].p}</td>
+        <td class="pts-badge">${t[1].pts}</td>
       </tr>
     `).join("");
   }
 
-  function loadSquads() {
-    const list = document.getElementById("squadsList");
-    list.innerHTML = SQUADS_DATA.map(team => `
-      <div class="squad-card">
-        <div class="squad-title"><span>${team.name}</span><span style="font-size:10px; opacity:0.7">👥 ${team.players.length}</span></div>
-        <ul class="player-list">${team.players.map(p => `<li class="player-item">${p}</li>`).join("")}</ul>
-      </div>
-    `).join("");
+  function getTitle(rank) {
+    if (rank === 1) return "🔥 المحترف";
+    if (rank === 2) return "🧠 العبقري";
+    if (rank === 3) return "🎯 القناص";
+    if (rank <= 10) return "💪 مجتهد";
+    return "⚽ مشارك";
   }
 
-  async function loadLeaderboard() {
-    const { data: participants } = await supabase.from("participants").select("id, name");
-    const { data: predictions } = await supabase.from("predictions").select("*");
+  async function loadFantasy() {
+    const { data: parts } = await supabase.from("participants").select("*");
+    const { data: preds } = await supabase.from("predictions").select("*");
     const { data: matches } = await supabase.from("matches").select("*").not("score_a", "is", null);
-    const matchMap = {};
-    matches.forEach(m => matchMap[m.id] = m);
-
-    const leaderData = (participants || []).map(p => {
-      let pts = 0;
-      predictions.filter(pr => pr.participant_id === p.id).forEach(pr => {
-        const m = matchMap[pr.match_id];
+    
+    const scores = parts?.map(p => {
+      let total = 0;
+      preds?.filter(pr => pr.participant_id === p.id).forEach(pr => {
+        const m = matches.find(mx => mx.id === pr.match_id);
         if (!m) return;
-        if (m.score_a === pr.pred_a && m.score_b === pr.pred_b) pts += 5;
-        else if ((m.score_a > m.score_b && pr.pred_a > pr.pred_b) || (m.score_a < m.score_b && pr.pred_a < pr.pred_b) || (m.score_a === m.score_b && pr.pred_a === pr.pred_b)) pts += 3;
+        if (m.score_a === pr.pred_a && m.score_b === pr.pred_b) total += 5;
+        else if (Math.sign(m.score_a - m.score_b) === Math.sign(pr.pred_a - pr.pred_b)) total += 3;
       });
-      return { name: p.name, points: pts };
-    }).sort((a,b) => b.points - a.points);
+      return { name: p.name, pts: total };
+    }).sort((a,b) => b.pts - a.pts) || [];
 
-    document.getElementById("lbBody").innerHTML = leaderData.map((r, i) => {
-      let rankClass = "";
-      let icon = i + 1;
-      let titleBadge = "";
-
-      if (i === 0) {
-        rankClass = "rank-1";
-        icon = "🥇";
-        titleBadge = `<span class="badge badge-gold">بطل التوقعات</span>`;
-      } else if (i === 1) {
-        rankClass = "rank-2";
-        icon = "🥈";
-        titleBadge = `<span class="badge badge-silver">الوصيف</span>`;
-      } else if (i === 2) {
-        rankClass = "rank-3";
-        icon = "🥉";
-      }
+    document.getElementById('fantasyBody').innerHTML = scores.map((s, i) => {
+      const rank = i + 1;
+      let medal = rank;
+      let rowClass = "";
+      if (rank === 1) { medal = "🥇"; rowClass = "rank-gold"; }
+      else if (rank === 2) { medal = "🥈"; rowClass = "rank-silver"; }
+      else if (rank === 3) { medal = "🥉"; rowClass = "rank-bronze"; }
 
       return `
-        <tr class="${rankClass}">
-          <td style="font-size: 16px;">${icon}</td>
+        <tr class="${rowClass}">
+          <td>${medal}</td>
           <td style="text-align:right">
-            <span style="font-weight:bold">${r.name}</span>
-            ${titleBadge}
+            <b>${s.name}</b>
+            <span class="badge-label">${getTitle(rank)}</span>
           </td>
-          <td class="pts">${r.points}</td>
+          <td class="pts-badge">
+            ${s.pts}
+            <span class="badge-label">نقطة</span>
+          </td>
         </tr>
       `;
     }).join("");
   }
 
-  function switchTab(tabId) {
-    document.querySelectorAll(".tab").forEach(x => {
-      x.classList.remove("active");
-      if(x.dataset.tab === tabId) x.classList.add("active");
-    });
-    
-    document.getElementById("matches").style.display = "none";
-    document.getElementById("teams-standings").style.display = "none";
-    document.getElementById("leaderboard").style.display = "none";
-    document.getElementById("squads").style.display = "none";
-
-    const el = document.getElementById(tabId);
-    if(el) el.style.display = (tabId === "matches") ? "grid" : "block";
-    
-    if (tabId === "leaderboard") loadLeaderboard();
-    if (tabId === "squads") loadSquads();
-    if (tabId === "matches") loadMatches();
-    if (tabId === "teams-standings") loadTeamsStandings();
+  function loadSquads() {
+    document.getElementById('squadsList').innerHTML = SQUADS.map(s => `
+      <div class="squad-item">
+        <div class="squad-head">${s.name}</div>
+        <div class="players-flex">
+          ${s.players.map(p => `<span class="player-chip">${p}</span>`).join("")}
+        </div>
+      </div>
+    `).join("");
   }
 
-  window.onload = () => {
-    document.getElementById('loginBtn').addEventListener('click', handleLogin);
-    checkUserStatus();
-    loadMatches();
-    document.querySelectorAll(".tab").forEach(t => {
-      t.addEventListener("click", () => switchTab(t.dataset.tab));
-    });
-  };
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    
+    document.getElementById('matches-content').style.display = 'none';
+    document.getElementById('standings-content').style.display = 'none';
+    document.getElementById('fantasy-content').style.display = 'none';
+    document.getElementById('teams-content').style.display = 'none';
+
+    if (tab === 'matches') { document.getElementById('matches-content').style.display = 'block'; loadMatches(); }
+    if (tab === 'standings') { document.getElementById('standings-content').style.display = 'block'; loadStandings(); }
+    if (tab === 'fantasy') { document.getElementById('fantasy-content').style.display = 'block'; loadFantasy(); }
+    if (tab === 'teams') { document.getElementById('teams-content').style.display = 'block'; loadSquads(); }
+  }
+
+  document.getElementById('loginBtn').onclick = login;
+  document.querySelectorAll('.tab').forEach(t => {
+    t.onclick = (e) => switchTab(t.dataset.tab);
+  });
+
+  // التشغيل الأولي
+  updateAuthUI();
+  loadMatches();
+
 </script>
 </body>
 </html>
