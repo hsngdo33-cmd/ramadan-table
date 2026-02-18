@@ -90,7 +90,7 @@
       background: rgba(255, 255, 255, 0.05);
       font-weight: bold;
       cursor: pointer;
-      font-size: 12px;
+      font-size: 11px;
       border: 1px solid transparent;
       transition: 0.2s;
       color: var(--m);
@@ -271,6 +271,7 @@
       padding: 0 20px;
       border-radius: 10px;
       font-weight: bold;
+      height: 45px;
     }
 
     .rank-gold { background: rgba(255, 211, 106, 0.15) !important; }
@@ -303,7 +304,7 @@
     <div id="authSection" class="card" style="margin-top:15px;">
       <p style="margin:0 0 10px; font-size:12px; text-align:center;">سجل اسمك للمشاركة في التوقعات</p>
       <div style="display:flex; gap:8px;">
-        <input type="text" id="nameInput" placeholder="اكتب اسمك" style="flex:1; height:45px; border-radius:10px; border:1px solid var(--bd); background:#000; color:#fff; padding:0 12px;">
+        <input type="text" id="nameInput" placeholder="اكتب اسمك الذي سجلت به أول مرة" style="flex:1; height:45px; border-radius:10px; border:1px solid var(--bd); background:#000; color:#fff; padding:0 12px;">
         <button id="loginBtn" class="btn-login">دخول</button>
       </div>
     </div>
@@ -317,7 +318,7 @@
     <div class="tabs">
       <div class="tab active" data-tab="matches">جدول المباريات</div>
       <div class="tab" data-tab="standings">ترتيب الفرق</div>
-      <div class="tab" data-tab="fantasy">ترتيب الفانتزيا</div>
+      <div class="tab" data-tab="fantasy">ترتيب فانتزيا</div>
       <div class="tab" data-tab="teams">تشكيل الفرق</div>
     </div>
 
@@ -335,6 +336,9 @@
                 <th>#</th>
                 <th style="text-align:right">الفريق</th>
                 <th>لعب</th>
+                <th>له</th>
+                <th>عليه</th>
+                <th>فرق</th>
                 <th>نقاط</th>
               </tr>
             </thead>
@@ -378,27 +382,33 @@
   let countdownIntervals = {};
   
   const SQUADS = [
-    { name: "أصدقاء محمد حسن", players: ["محمد وليد معوض", "احمد صلاح", "ممدوح عاطف", "محمد المصري", "عمار لبيب", "احمد السيد صالح", "عمر لبيب", "احمد اشرف الامير", "محمد علي عوض", "كريم خليفه","حسن محمد حسن", "اسلام صادق"] },
+    { name: "أصدقاء محمد حسن", players: ["محمد وليد معوض","حسن محمد حسن", "احمد صلاح", "ممدوح عاطف", "محمد المصري", "عمار لبيب", "احمد السيد صالح", "عمر لبيب", "احمد اشرف الامير", "محمد علي عوض", "كريم خليفه", "اسلام صادق"] },
     { name: "إيطاليانو كافيه", players: ["تامر عبد الرحمن", "محمد طه", "علي صبري", "امير علي", "الشحات صلاح", "جلال شبانه", "محمد ابراهيم صالح", "ماهر المنسي", "رضا صادق", "اسامه صلاح", "محمد القلش", "محمود اسلام"] },
     { name: "البودي", players: ["عمر عادل المخزنجي", "زياد الديسطي", "اشرف السيد درماله", "محمد السيد برهام", "احمد ايهاب البلطجي", "طارق مطاوع", "محمد حسني", "عبد الوهاب القاضي", "مازن علي الكردي", "احمد محمد حسن", "محمد عادل البرمه"] },
     { name: "أصدقاء مصطفى الشحات", players: ["السيد رجب", "احمد سامح", "احمد رضا المنجي", "فتحي السيد", "ياسين الهنداوى", "احمد صابر", "رضا القناص", "محمد رضا المنجي", "محمود محمد معوض", "فارس اشرف"] },
-    { name: "أبو ملاك للموتسيكلات", players: ["احمد ياسر", "احمد رضا العيسوي", "محمد رفعت", "وليد ممدوح", "محمد العيسوي", "اشرف حسني", "عمر الهنداوى", "احمد الدريني", "محمد احمد عبده", "ايهاب البوب", "احمد كمال"] },
+    { name: "أبو ملاك للموتسيكلات", players: [ "احمد ياسر", "احمد رضا العيسوي", "محمد رفعت", "وليد ممدوح", "محمد العيسوي", "اشرف حسني", "عمر الهنداوى", "احمد الدريني", "محمد احمد عبده", "ايهاب البوب", "احمد كمال"] },
     { name: "أصدقاء الفخراني", players: ["عمر نقموش", "احمد محمود", "رمضان مطاوع", "محمد الفخراني", "محمود شوقي", "محمد جمال حمادة", "عبده سامي", "البالا", "احمد فتحي الباز", "علي المنجي"] },
     { name: "أولاد حبيشي للجبس", players: ["عبد الله محمد عبد الله", "جمال طارق العشري", "علي صبري", "هشام الخطيب", "رضا انور العيسوي", "احمد عادل صبري", "مصطفي حبيشي", "محمد حسن قش", "القطب فرج", "شعبان نادر", "محمد عادل شبانه"] }
   ];
 
-  // دالة تسجيل الدخول المحسنة
   async function login() {
     const nameInput = document.getElementById('nameInput');
     const name = nameInput.value.trim();
     if (!name) return alert('برجاء ادخال الاسم للمشاركة');
     
     try {
-        // البحث عن المستخدم أو إنشاؤه
-        let { data: user, error: fetchError } = await supabase.from('participants').select('*').eq('name', name).maybeSingle();
+        let { data: user, error: fetchError } = await supabase
+            .from('participants')
+            .select('*')
+            .eq('name', name)
+            .maybeSingle();
         
         if (!user) {
-            const { data: newUser, error: insertError } = await supabase.from('participants').insert([{ name }]).select().single();
+            const { data: newUser, error: insertError } = await supabase
+                .from('participants')
+                .insert([{ name }])
+                .select()
+                .single();
             if (insertError) throw insertError;
             user = newUser;
         }
@@ -406,17 +416,15 @@
         currentUser = user;
         localStorage.setItem('fantazia_user', JSON.stringify(user));
         
-        // تحديث الواجهة فوراً بدلاً من عمل reload
         updateAuthUI();
-        loadMatches(); 
-        alert(`أهلاً بك يا ${name}! يمكنك الآن وضع توقعاتك.`);
+        await loadMatches();
+        alert(`أهلاً بك يا ${name}! تم جلب بياناتك بنجاح.`);
     } catch (err) {
         console.error(err);
-        alert('حدث خطأ في الاتصال، تأكد من وجود إنترنت وحاول مرة أخرى');
+        alert('حدث خطأ في الاتصال، حاول مرة أخرى');
     }
   }
 
-  // تحديث حالة تسجيل الدخول في الواجهة
   function updateAuthUI() {
     const authSection = document.getElementById('authSection');
     const userInfo = document.getElementById('userInfo');
@@ -432,7 +440,6 @@
     }
   }
 
-  // دالة تسجيل الخروج
   window.logout = () => {
     localStorage.removeItem('fantazia_user');
     currentUser = null;
@@ -487,7 +494,6 @@
     container.innerHTML = matches.map((m, i) => {
       const pred = preds.find(x => x.match_id === m.id);
       const isPlayed = m.score_a !== null;
-      // وقت غلق التوقعات هو الساعة 5 مساءً في يوم المباراة (أيام فبراير/مارس 2026 الافتراضية)
       const closeDate = new Date(2026, 1, 18 + i, 17, 0, 0); 
       const isLocked = isPlayed || (new Date() > closeDate);
 
@@ -524,6 +530,7 @@
   }
 
   window.savePred = async (matchId) => {
+    if (!currentUser) return alert("سجل دخولك أولاً");
     const vA = document.getElementById(`pA_${matchId}`).value;
     const vB = document.getElementById(`pB_${matchId}`).value;
     if (vA === "" || vB === "") return alert("ادخل التوقعات أولاً");
@@ -542,23 +549,40 @@
   async function loadStandings() {
     const { data: matches } = await supabase.from("matches").select("*").not("score_a", "is", null);
     const table = {};
-    SQUADS.forEach(s => table[s.name] = { p: 0, pts: 0 });
+    SQUADS.forEach(s => table[s.name] = { p: 0, pts: 0, gs: 0, gc: 0 });
 
     matches?.forEach(m => {
-      if (!table[m.team_a]) table[m.team_a] = { p:0, pts:0 };
-      if (!table[m.team_b]) table[m.team_b] = { p:0, pts:0 };
-      table[m.team_a].p++; table[m.team_b].p++;
+      if (!table[m.team_a]) table[m.team_a] = { p:0, pts:0, gs:0, gc:0 };
+      if (!table[m.team_b]) table[m.team_b] = { p:0, pts:0, gs:0, gc:0 };
+      
+      table[m.team_a].p++; 
+      table[m.team_b].p++;
+      
+      table[m.team_a].gs += m.score_a;
+      table[m.team_a].gc += m.score_b;
+      table[m.team_b].gs += m.score_b;
+      table[m.team_b].gc += m.score_a;
+
       if (m.score_a > m.score_b) table[m.team_a].pts += 3;
       else if (m.score_b > m.score_a) table[m.team_b].pts += 3;
       else { table[m.team_a].pts += 1; table[m.team_b].pts += 1; }
     });
 
-    const sorted = Object.entries(table).sort((a,b) => b[1].pts - a[1].pts);
+    const sorted = Object.entries(table).sort((a,b) => {
+        if (b[1].pts !== a[1].pts) return b[1].pts - a[1].pts;
+        const diffA = a[1].gs - a[1].gc;
+        const diffB = b[1].gs - b[1].gc;
+        return diffB - diffA;
+    });
+
     document.getElementById('teamsBody').innerHTML = sorted.map((t, i) => `
       <tr>
         <td>${i+1}</td>
         <td style="text-align:right">${t[0]}</td>
         <td>${t[1].p}</td>
+        <td>${t[1].gs}</td>
+        <td>${t[1].gc}</td>
+        <td>${t[1].gs - t[1].gc}</td>
         <td class="pts-badge">${t[1].pts}</td>
       </tr>
     `).join("");
@@ -568,7 +592,7 @@
     if (rank === 1) return "🔥 المحترف";
     if (rank === 2) return "🧠 العبقري";
     if (rank === 3) return "🎯 القناص";
- 
+    if (rank <= 10) return "💪 مجتهد";
     return "⚽ مشارك";
   }
 
@@ -643,7 +667,6 @@
     t.onclick = (e) => switchTab(t.dataset.tab);
   });
 
-  // التشغيل الأولي
   updateAuthUI();
   loadMatches();
 
